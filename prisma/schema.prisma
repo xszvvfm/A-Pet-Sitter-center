@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int           @id @default(autoincrement())
+  username      String
+  password      String
+  email         String        @unique
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  reservations  Reservation[]
+  reviews       Review[]
+  refreshTokens RefreshToken?
+
+  @@map("users")
+}
+
+model PetSitter {
+  id           Int           @id @default(autoincrement())
+  name         String
+  experience   Int
+  region       String
+  reservations Reservation[]
+  reviews      Review[]
+
+  @@map("pet_sitter")
+}
+
+model Reservation {
+  id        Int         @id @default(autoincrement())
+  sitterId  Int         @map("sitter_id")
+  userId    Int         @map("user_id")
+  date      DateTime
+  service   ServiceType
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+  petSitter PetSitter   @relation(fields: [sitterId], references: [id])
+  user      User        @relation(fields: [userId], references: [id])
+  review    Review?
+
+  @@unique([sitterId, date]) // 같은 펫시터가 같은 날에 중복 예약되지 않도록 설정
+  @@map("reservations")
+}
+
+model Review {
+  id            Int          @id @default(autoincrement())
+  sitterId      Int          @map("sitter_id")
+  userId        Int          @map("user_id")
+  date          DateTime
+  rating        Int
+  comment       String
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+  reservationId Int          @unique @map("reservation_id")
+  reservation   Reservation? @relation(fields: [reservationId], references: [id])
+  petSitter     PetSitter    @relation(fields: [sitterId], references: [id])
+  user          User         @relation(fields: [userId], references: [id])
+
+  @@map("reviews")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique @map("user_id")
+  token     String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  User      User     @relation(fields: [userId], references: [id])
+
+  @@map("refresh_tokens")
+}
+
+enum ServiceType {
+  PET_WALKING
+  PET_CARE
+  PET_GROOMING
+}
