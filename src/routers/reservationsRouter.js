@@ -6,7 +6,7 @@ import { prisma } from '../utils/prisma.utils.js';
 const reservationsRouter = express.Router();
 
 // 예약 생성 API
-router.post('/', async (req, res) => {
+reservationsRouter.post('/', async (req, res) => {
   const { userId, sitterId, date, service } = req.body;
 
   try {
@@ -31,10 +31,10 @@ router.post('/', async (req, res) => {
       .json({ error: '예약을 생성할 수 없습니다.' });
   }
 });
-a;
+
 
 // 예약 조회 API
-router.get('/', async (req, res) => {
+reservationsRouter.get('/', async (req, res) => {
   const { userId } = req.query;
 
   try {
