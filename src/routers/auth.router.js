@@ -1,6 +1,8 @@
 import express from 'express'
 import {PrismaClient} from '@prisma/client';
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken';
+import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET} from '../constants/env.constants.js';
 
 const prisma = new PrismaClient();
 
@@ -50,10 +52,65 @@ authRouter.post('/sign-in', async(req, res, next) => {
             res.status(400).json({message:"비밀번호를 확인해주세요."})
             return
         }
-        const accessToken = await genera
+        const payload = {id: user.id};
+        const data = await generateAuthTokens(payload);
+        return res.status(200).json({status:200, message: "로그인에 성공하였습니다.",data})
+    } catch (error) {
+        next(error);
+    }
+})
+// 토큰 재발급
+authRouter.post('/token', async(req, res, next) => {
+    try{
+        const user = req.user;
+        const payload = {id: user.id}
+        const data = await generateAuthTokens(payload);
+
+        return res.status(200).json({status:200,message:"토큰이 발급되었습니다",data})
     } catch (error) {
         next(error)
     }
 })
+
+//로그아웃
+authRouter.post('/sign-out', async(req, res, next) => {
+    try{
+        const user = req.user
+        await prisma.refreshToken.update({
+            where: { userId: user.id},
+            data : { refreshToken: null }
+        });
+        return res.status(200).json({status:200, message:"로그아웃 하였습니다.", data: {id: user.id}})
+    } catch(error) {
+        next(error)
+    }
+})
+
+//토큰생성 함수
+const generateAuthTokens = async (payload) => {
+    const userId = payload.id;
+    const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {
+        expiresIn: '12h'
+    });
+    const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET,{
+        expiresIn: '7d'
+    })
+    const hashedRefreshToken = bcrypt.hashSync(refreshToken, 10)
+
+    //refreshtoken 생성하거나 갱신
+    await prisma.refreshToken.upsert({
+        where: {
+            userId,
+        },
+        update: {
+            refreshToken: hashedRefreshToken,
+        },
+        create: {
+            userId,
+            refreshToken: hashedRefreshToken,
+        }
+    });
+    return {accessToken, refreshToken};
+}
 
 export {authRouter};
