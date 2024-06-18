@@ -7,4 +7,9 @@ export const MESSAGES = {
       SUCCEED: '예약 삭제에 성공했습니다.',
     },
   },
+  AUTH: {
+    COMMON:{
+      
+    }
+  }
 };

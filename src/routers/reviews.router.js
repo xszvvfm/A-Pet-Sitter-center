@@ -2,11 +2,11 @@
 import { Router } from 'express';
 import { prisma } from '../utils/prisma.utils.js';
 
-const router = Router();
+const reviewsRouter = Router();
 
 
 //리뷰 생성 api(미들웨어추가로 id를 입력받고 예약id를 body로 입력받아 date값을 받아오도록 수정이 필요함)
-router.post('/sitters/:sitterId/reviews', async (req, res, next) => {
+reviewsRouter.post('/sitters/:sitterId/reviews', async (req, res, next) => {
   const { sitterId } = req.params;
   const { comment, rating } = req.body;
 
@@ -75,7 +75,7 @@ router.post('/sitters/:sitterId/reviews', async (req, res, next) => {
 
 
 //리뷰 상세조회 api
-router.get('/sitters/:sitterId/reviews/:reviewId', async (req, res, next) => {
+reviewsRouter.get('/sitters/:sitterId/reviews/:reviewId', async (req, res, next) => {
   const { sitterId, reviewId } = req.params;
   const userId = 2; // 임시 유저 ID
 
@@ -115,7 +115,7 @@ router.get('/sitters/:sitterId/reviews/:reviewId', async (req, res, next) => {
 
 
 //리뷰 전체 조회 api
-router.get('/sitters/:sitterId/reviews', async (req, res, next) => {
+reviewsRouter.get('/sitters/:sitterId/reviews', async (req, res, next) => {
   const { sitterId } = req.params;
 
   try {
@@ -157,7 +157,7 @@ router.get('/sitters/:sitterId/reviews', async (req, res, next) => {
 
 //리뷰 수정 api(미들웨어에서 엑세스토큰으로 유저id를 받아오도록 수정필요 date를 위해 예약id도 추후 body로 받아오도록 수정필요)
 
-router.patch('/sitters/:sitterId/reviews/:reviewId', async (req, res, next) => {
+reviewsRouter.patch('/sitters/:sitterId/reviews/:reviewId', async (req, res, next) => {
   const { sitterId, reviewId } = req.params;
   const { re_comment, re_rating } = req.body;
 
@@ -210,7 +210,7 @@ router.patch('/sitters/:sitterId/reviews/:reviewId', async (req, res, next) => {
 
 
 //리뷰 삭제 api (미들웨어에서 엑세스토큰으로 유저id를 받아오도록 수정필요)
-router.delete('/sitters/:sitterId/reviews/:reviewId', async (req, res, next) => {
+reviewsRouter.delete('/sitters/:sitterId/reviews/:reviewId', async (req, res, next) => {
   const { sitterId, reviewId } = req.params;
 
   // 나중에 액세스 토큰에서 유저 ID를 가져오도록 수정 필요
@@ -241,4 +241,4 @@ router.delete('/sitters/:sitterId/reviews/:reviewId', async (req, res, next) => 
   }
 });
 
-export default router;
+export {reviewsRouter};
