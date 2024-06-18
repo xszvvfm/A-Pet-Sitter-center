@@ -28,6 +28,7 @@ export const requireRefreshToken = async (req, res, next) => {
         let payload;
         try{
             payload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
+            
         } catch (error) {
             //유효기간 지난 경우
             if(error.name === 'TokenExpiredError') {
@@ -42,13 +43,13 @@ export const requireRefreshToken = async (req, res, next) => {
                 });
             }   
         }
-        const {id} = payload;
+        const { id } = payload;
         const existedRefreshToken = await prisma.refreshToken.findUnique({
             where: { userId: id},
         })
-        const isValidRefreshToken = existedRefreshToken?.refreshToken &&
-            bcrypt.compareSync(refreshToken, existedRefreshToken.refreshToken);
-
+        const isValidRefreshToken = 
+        existedRefreshToken?.token && bcrypt.compareSync(refreshToken, existedRefreshToken.token);
+        console.log(isValidRefreshToken)
         if(!isValidRefreshToken) {
             return res.status(HTTP_STATUS.UNAUTHORIZED).json({
                 status: HTTP_STATUS.UNAUTHORIZED, message: "폐기된 인증 정보입니다."
