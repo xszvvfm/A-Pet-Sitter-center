@@ -1,69 +1,122 @@
 import express from 'express';
 import { HTTP_STATUS } from '../constants/http-status.constant.js';
 import { MESSAGES } from '../constants/message.constant.js';
+// import { createReservationValidator } from '../middlewares/validators/create-reservation-validator.middleware.js';
+import { requireAccessToken } from '../middlewares/require-access-token.middleware.js';
 import { prisma } from '../utils/prisma.utils.js';
 
 const reservationsRouter = express.Router();
 
-// 예약 생성 API
-reservationsRouter.post('/', async (req, res) => {
-  const { userId, sitterId, date, service } = req.body;
-
+/** 예약 생성 API **/
+reservationsRouter.post('/', requireAccessToken, async (req, res, next) => {
   try {
-    const reservation = await prisma.reservation.create({
+    const user = req.user;
+    const userId = user.id;
+    const { sitterId, date, service } = req.body;
+
+    console.log(req.body);
+
+    // 필수 입력 필드 검증
+    if (!sitterId || !date || !service) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
+        status: HTTP_STATUS.BAD_REQUEST,
+        message: 'OOO를 입력해 주세요.',
+      });
+    }
+
+    // PetSitter가 존재하는지 확인
+    const petSitter = await prisma.petSitter.findUnique({
+      where: { id: +sitterId },
+    });
+
+    if (!petSitter) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
+        status: HTTP_STATUS.BAD_REQUEST,
+        message: '유효하지 않은 sitterId입니다.',
+      });
+    }
+
+    const data = await prisma.reservation.create({
       data: {
-        userId: Number(userId),
-        sitterId: Number(sitterId),
+        sitterId: +sitterId,
+        userId: +userId,
         date: new Date(date),
-        service: service,
-      },
-      include: {
-        User: true,
-        PetSitter: true,
+        service,
       },
     });
 
-    res.status(HTTP_STATUS.CREATED).json(reservation);
+    return res.status(HTTP_STATUS.CREATED).json({
+      status: HTTP_STATUS.CREATED,
+      message: MESSAGES.RESERVATIONS.CREATE.SUCCEED,
+      data: {
+        reserveId: data.id,
+        userId: data.userId,
+        sitterId: data.sitterId,
+        date: data.date,
+        serviceType: data.service,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+      },
+    });
   } catch (error) {
-    console.error('예약 생성 실패:', error);
-    res
-      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ error: '예약을 생성할 수 없습니다.' });
+    next(error);
   }
 });
 
-
-// 예약 조회 API
-reservationsRouter.get('/', async (req, res) => {
-  const { userId } = req.query;
-
+/** 예약 목록 조회 API **/
+reservationsRouter.get('/', async (req, res, next) => {
   try {
-    const reservations = await prisma.reservation.findMany({
+    const user = req.user;
+    const userId = user.id;
+
+    let { sort } = req.query;
+
+    sort = sort?.toLowerCase();
+
+    if (sort !== 'desc' && sort !== 'asc') {
+      sort = 'desc';
+    }
+
+    let data = await prisma.reservation.findMany({
       where: {
-        userId: Number(userId),
+        userId: +userId,
       },
-      include: {
-        User: true,
-        PetSitter: true,
+      orderBy: {
+        createdAt: sort,
       },
     });
 
-    res.status(HTTP_STATUS.OK).json(reservations);
+    data = data.map((reservation) => {
+      return {
+        reserveId: reservation.id,
+        userId: reservation.userId,
+        sitterId: reservation.sitterId,
+        date: reservation.date,
+        serviceType: reservation.service,
+        createdAt: reservation.createdAt,
+        updatedAt: reservation.updatedAt,
+      };
+    });
+
+    return res.status(HTTP_STATUS.OK).json({
+      status: HTTP_STATUS.OK,
+      message: MESSAGES.RESERVATIONS.READ_LIST.SUCCEED,
+      data,
+    });
   } catch (error) {
-    console.error('예약 조회 실패:', error);
-    res
-      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ error: '예약을 조회할 수 없습니다.' });
+    next(error);
   }
 });
 
 /** 예약 삭제 API **/
 reservationsRouter.delete('/:reserveId', async (req, res, next) => {
   try {
+    const user = req.user;
+    const userId = user.id;
     const { reserveId } = req.params;
 
-    const existedReservation = await prisma.reservations.findUnique({
-      where: { reserveId: +reserveId },
+    const existedReservation = await prisma.reservation.findUnique({
+      where: { userId: +userId, id: +reserveId },
     });
 
     if (!existedReservation) {
@@ -73,14 +126,14 @@ reservationsRouter.delete('/:reserveId', async (req, res, next) => {
       });
     }
 
-    const data = await prisma.reservations.delete({
-      where: { reserveId: +reserveId },
+    const data = await prisma.reservation.delete({
+      where: { userId: +userId, id: +reserveId },
     });
 
     return res.status(HTTP_STATUS.OK).json({
       status: HTTP_STATUS.OK,
       message: MESSAGES.RESERVATIONS.DELETE.SUCCEED,
-      data: { id: data.reserveId },
+      data: { id: data.id },
     });
   } catch (error) {
     next(error);

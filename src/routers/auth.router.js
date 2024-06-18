@@ -13,7 +13,7 @@ const authRouter = express.Router();
 
 
 //회원가입
-authRouter.post('/sign-up',  async (req, res, next) => {
+authRouter.post('/sign-up', async (req, res, next) => {
   try {
     const { email, password, passwordConfirm, username } = req.body;
     const existedUser = await prisma.user.findUnique({
