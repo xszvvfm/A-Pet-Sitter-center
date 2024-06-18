@@ -1,26 +1,23 @@
 import express from 'express'
-import {PrismaClient} from '@prisma/client';
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET} from '../constants/env.constants.js';
+import { prisma } from '../utils/prisma.util.js';
+import { requireRefreshToken } from '../middlewares/require-refresh-token.middleware.js';
 
-const prisma = new PrismaClient();
-
-const authRouter =express();
+const authRouter =express.Router();
 
 //회원가입
 authRouter.post('/sign-up', async(req, res, next) => {
     try{const { email, password, passwordConfirm, username } = req.body;
     const existedUser = await prisma.user.findUnique({
-        where :{email}
+        where :{ email }
     })
     if(existedUser) {
-        res.status(400).json({message:"이미 가입 된 사용자입니다."})
-        return
+        return res.status(400).json({message:"이미 가입 된 사용자입니다."})    
     }
     if(password !== passwordConfirm) {
-        res.status(400).json({message:"비밀번호 값이 일치하지 않습니다."})
-        return
+        return res.status(400).json({message:"비밀번호 값이 일치하지 않습니다."})
     }
     const hassedPassword = bcrypt.hashSync( password, 10)
     const {_password, ...user} = await prisma.user.create({
@@ -39,18 +36,16 @@ authRouter.post('/sign-up', async(req, res, next) => {
 //로그인
 authRouter.post('/sign-in', async(req, res, next) => {
     try{
-        const {email, password} = req.body
+        const { email, password } = req.body;
         const user = await prisma.user.findUnique({
-            where:{email}
+            where:{ email }
         })
         if(!user) {
-            res.status(400).json({message:"가입되지 않은 이메일입니다."})
-            return
+            return res.status(400).json({message:"가입되지 않은 이메일입니다."})       
         }
         const passwordCheck = bcrypt.compareSync(password, user.password);
         if(!passwordCheck) {
-            res.status(400).json({message:"비밀번호를 확인해주세요."})
-            return
+            return res.status(400).json({message:"비밀번호를 확인해주세요."})          
         }
         const payload = {id: user.id};
         const data = await generateAuthTokens(payload);
@@ -60,25 +55,25 @@ authRouter.post('/sign-in', async(req, res, next) => {
     }
 })
 // 토큰 재발급
-authRouter.post('/token', async(req, res, next) => {
+authRouter.post('/token', requireRefreshToken, async(req, res, next) => {
     try{
         const user = req.user;
         const payload = {id: user.id}
         const data = await generateAuthTokens(payload);
 
-        return res.status(200).json({status:200,message:"토큰이 발급되었습니다",data})
+        return res.status(200).json({ status:200, message:"토큰이 발급되었습니다", data })
     } catch (error) {
         next(error)
     }
 })
 
 //로그아웃
-authRouter.post('/sign-out', async(req, res, next) => {
+authRouter.post('/sign-out', requireRefreshToken, async(req, res, next) => {
     try{
         const user = req.user
         await prisma.refreshToken.update({
             where: { userId: user.id},
-            data : { refreshToken: null }
+            data : { token: null }
         });
         return res.status(200).json({status:200, message:"로그아웃 하였습니다.", data: {id: user.id}})
     } catch(error) {
@@ -103,14 +98,14 @@ const generateAuthTokens = async (payload) => {
             userId,
         },
         update: {
-            refreshToken: hashedRefreshToken,
+            token: hashedRefreshToken,
         },
         create: {
             userId,
-            refreshToken: hashedRefreshToken,
+            token: hashedRefreshToken,
         }
     });
-    return {accessToken, refreshToken};
+    return { accessToken, refreshToken };
 }
 
-export {authRouter};
+export { authRouter };
