@@ -15,11 +15,9 @@ reviewsRouter.post(
     const userId = req.user.id; // 미들웨어에서 가져온 유저 ID
 
     if (!comment || !rating || !reservationId) {
-      return res
-        .status(400)
-        .json({
-          error: 'comment, rating, reservationId는 필수 입력사항입니다.',
-        });
+      return res.status(400).json({
+        error: 'comment, rating, reservationId는 필수 입력사항입니다.',
+      });
     }
 
     try {

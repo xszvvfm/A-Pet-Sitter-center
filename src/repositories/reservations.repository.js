@@ -1,38 +1,28 @@
-import { prisma } from '@prisma/client';
-import { HttpError } from '../errors/httperror.js';
-import { MESSAGES } from '../constants/messages.const.js';
+import { prisma } from '../utils/prisma.utils.js';
 
-export class reservationsRepository {
-  update = async (id, sitter_id, date, service) => {
-    const existReservation = await prisma.reservation.findUnique({
+export class ReservationsRepository {
+  findById = async (id) => {
+    const existReservation = await prisma.reservation.findFirst({
       where: {
         id,
-        sitter_id,
-        date,
-        service,
       },
-
-      //service,
     });
-    if (!existReservation) {
-      //아래에 넣을 내용 HttpError.
-      throw new HttpError.HTTP_STATUS.CONFLICT(
-        MESSAGES.RESERVATION.READ.IS_NOT_RESERVATION,
-      );
-    }
-    const patchResevation = await prisma.reservation.update({
+    return existReservation;
+  };
+
+  // };
+  // gogo = async (id, sitterId, date, service) => {
+  updateReservation = async (id, sitterId, date, service) => {
+    const updatedReservation = await prisma.reservation.update({
       where: {
         id,
-        sitter_id,
-        date,
-        service,
       },
-      patchResevation: {
-        ...(sitter_id && { sitter_id }),
+      data: {
+        ...(sitterId && { sitterId }),
         ...(date && { date }),
         ...(service && { service }),
       },
     });
-    return patchResevation;
+    return updatedReservation;
   };
 }

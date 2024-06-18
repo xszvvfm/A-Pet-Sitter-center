@@ -1,22 +1,22 @@
 import { HTTP_STATUS } from '../constants/http-status.constant.js';
 import { MESSAGES } from '../constants/messages.const.js';
-import { reservationsService } from '../services/reservations.services.js';
-import { prisma } from '@prisma/client';
+import { ReservationsService } from '../services/reservations.services.js';
+// import { prisma } from '@prisma/client';
 
-export class reservationsController {
-  reservationsService = new reservationsService();
+export class ReservationsController {
+  reservationsService = new ReservationsService();
 
   //상세조회
   getReservationById = async (req, res, next) => {
     try {
-      const { reserveId } = req.params;
+      const { id } = req.params;
 
       const oneReservation =
-        await this.reservationsService.findReservationById(reserveId);
+        await this.reservationsService.findReservationById(id);
 
       return res.status(HTTP_STATUS.OK).json({
         status: HTTP_STATUS.OK,
-        message: MESSAGES.RESERVATION.READ.SUCCED,
+        message: MESSAGES.RESERVATION.READ.SUCCEED,
         oneReservation,
       });
     } catch (error) {
@@ -25,7 +25,7 @@ export class reservationsController {
   };
 
   //
-  update = async (res, req, next) => {
+  updateReservation = async (req, res, next) => {
     //예약수정 : 시터아이디, 날짜, 서비스타입 : 바디로 받아오기
 
     try {
@@ -35,25 +35,26 @@ export class reservationsController {
       //reserveId 가져오기
       const { id } = req.params;
       //수정할 정보
-      const { sitter_id, date, service } = req.body;
+      const { sitterId, date, service } = req.body;
       //------//
       //있는 예약인지 확인하기 : service
 
-      //-----//가져올 아이디 등 어떻게 가져올지 다시 보기
-      const patchResevation = await reservationsService.update({
-        id,
-        sitter_id,
-        date,
-        service,
-      });
+      //-----//가져올 아이디 등 어떻게 가져올지 다시 보기 :
+      const updatedReservation =
+        await this.reservationsService.updateReservation(
+          parseInt(id),
+          parseInt(sitterId),
+          new Date(date),
+          service,
+        );
 
       return res.status(HTTP_STATUS.OK).json({
         status: HTTP_STATUS.OK,
-        message: MESSAGES.RESERVATION.UPDATE.SUCCED,
-        patchResevation,
+        message: MESSAGES.RESERVATION.UPDATE.SUCCEED,
+        updatedReservation,
       });
     } catch (error) {
-      // next(error);
+      next(error);
     }
   };
 }

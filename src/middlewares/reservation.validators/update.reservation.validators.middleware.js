@@ -2,7 +2,7 @@ import Joi from 'joi';
 // import { MESSAGES } from '../../constants/messages.const.js';
 
 const schema = Joi.object({
-  sitter_id: Joi.number(),
+  sitterId: Joi.number(),
   date: Joi.string(),
   service: Joi.string(),
 })

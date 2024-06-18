@@ -16,19 +16,19 @@ export const MESSAGES = {
           EMPTY: '이름은 비워둘 수 없습니다',
         },
       },
-      SUCCED: '회원가입에 성공했습니다.',
+      SUCCEED: '회원가입에 성공했습니다.',
     },
     SIGNIN: {
       //로그인 정보가 유효한지 : 있는 이메일인지, 비밀번호 맞는지
       IS_NOT_EMAIL: '인증정보가 유효하지 않습니다.',
-      SUCCED: '로그인에 성공했습니다.',
+      SUCCEED: '로그인에 성공했습니다.',
     },
     SIGN_OUT: {
       IS_NOT_EXIST: '정보가 일치하지 않습니다.',
-      SUCCED: '로그아웃에 성공했습니다.',
+      SUCCEED: '로그아웃에 성공했습니다.',
     },
     TOKEN: {
-      SUCCED: '토큰발급에 성공했습니다.',
+      SUCCEED: '토큰발급에 성공했습니다.',
     },
   },
 
@@ -42,14 +42,14 @@ export const MESSAGES = {
       IS_NOT_EXIST: '없는 시터 정보입니다.',
       INVALID_SERVICE_TYPE:
         'PET_WALKING 이나 PET_CARE, PET_GROOMING 에서 서비스를 골라주세요',
-      SUCCED: '예약이 완료되었습니다.',
+      SUCCEED: '예약이 완료되었습니다.',
     },
     READ: {
       IS_NOT_RESERVATION: '없는 예약정보입니다.',
-      SUCCED: '예약조회에 성공했습니다.',
+      SUCCEED: '예약조회에 성공했습니다.',
     },
     UPDATE: {
-      SUCCED: '예약수정이 완료되었습니다.',
+      SUCCEED: '예약수정이 완료되었습니다.',
     },
     COMMON: {
       NOT_FOUND: '예약이 존재하지 않습니다.',
@@ -59,9 +59,9 @@ export const MESSAGES = {
     },
   },
   REVIEW: {
-    SUCCED: '리뷰작성에 성공하였습니다.',
-    PATCH_SUCCED: '리뷰수정에 성공하였습니다.',
-    DELTE_SUCCED: '리뷰 삭제에 성공하였습니다.',
+    SUCCEED: '리뷰작성에 성공하였습니다.',
+    PATCH_SUCCEED: '리뷰수정에 성공하였습니다.',
+    DELTE_SUCCEED: '리뷰 삭제에 성공하였습니다.',
     FAIL: '실패하였습니다.',
     //리뷰작성 성공, 수정성공, 삭제성공,
   },

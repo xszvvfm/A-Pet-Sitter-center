@@ -1,44 +1,32 @@
-import { reservationsRepository } from '../repositories/reservations.repository.js';
+import { ReservationsRepository } from '../repositories/reservations.repository.js';
+import { HttpError } from '../errors/httperror.js';
+import { MESSAGES } from '../constants/messages.const.js';
 
-export class reservationService {
-  reservationsRepository = new reservationsRepository();
+export class ReservationsService {
+  reservationsRepository = new ReservationsRepository();
 
-    //
-    getReservationById = async(reserveId)
-     const data = await this.reservation.findUnique(reserveId);
-      if (!data) {
-        return res.status(HTTP_STATUS.NOT_FOUND).json({
-          status: HTTP_STATUS.NOT_FOUND,
-          message: MESSAGES.RESERVATION.READ.IS_NOT_RESERVATION,
-        });
-      }
-
-      return data = {
-        user_id: data.userId,
-        sitter_id: data.sitterId,
-        reserve_id: data.reserveId,
-        date: data.date,
-        service_type: data.service_type,
-        created_at: data.createdAt,
-        updated_at: data.updatedAt,
-
-        // user_id,
-        // sitter_id,
-        // reserve_id,
-        // date,
-        // service_type,
-        // created_at,
-        // updated_at,
-      };
-    //
-  update = async (id, sitter_id, date, service) => {
+  updateReservation = async (id, sitterId, date, service) => {
+    const existReservation = await this.reservationsRepository.findById(id);
     //있는 예약인지 확인하기 : service
-    const patchResevation = await this.reservationsRepository.update(
-      id,
-      sitter_id,
-      date,
-      service,
-    );
-    return patchResevation;
+
+    ///////
+    if (!existReservation) {
+      //아래에 넣을 내용 HttpError.
+      throw new HttpError.Conflict(
+        MESSAGES.RESERVATION.READ.IS_NOT_RESERVATION,
+      );
+    }
+
+    //   const parseDate = this.parseDate
+    //날짜파싱하는 함수.......ㅠㅠㅠㅠ
+    // update
+    const updatedReservation =
+      await this.reservationsRepository.updateReservation(
+        parseInt(id),
+        parseInt(sitterId),
+        new Date(date),
+        service,
+      );
+    return updatedReservation;
   };
 }
