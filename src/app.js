@@ -2,12 +2,14 @@ import express from 'express';
 import { SERVER_PORT } from './constants/env.constants.js';
 import { errorHandler } from './middlewares/error-handler.middleware.js';
 import { HTTP_STATUS } from './constants/http-status.constant.js';
+import { authRouter } from './routers/auth.router.js';
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use('/auth', authRouter)
 app.get('/health-check', (req, res) => {
   return res.status(HTTP_STATUS.OK).send(`I'm healthy.`);
 });
