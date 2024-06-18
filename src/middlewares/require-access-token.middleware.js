@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import { prisma } from '../utils/prisma.utils.js';
 import { HTTP_STATUS } from '../constants/http-status.constant.js';
 import { ACCESS_TOKEN_SECRET } from '../constants/env.constants.js';
+import { MESSAGES } from '../constants/message.constant.js';
 
 export const requireAccessToken = async (req, res, next) => {
   try {
@@ -10,20 +11,20 @@ export const requireAccessToken = async (req, res, next) => {
     if (!authorization) {
       return res.status(HTTP_STATUS.UNAUTHORIZED).json({
         status: HTTP_STATUS.UNAUTHORIZED,
-        message: '인증 정보가 없습니다.',
+        message: MESSAGES.AUTH.COMMON.JWT.NO_TOKEN,
       });
     }
     const [type, accessToken] = authorization.split(' ');
     if (type !== 'Bearer') {
       return res.status(HTTP_STATUS.UNAUTHORIZED).json({
         status: HTTP_STATUS.UNAUTHORIZED,
-        message: '지원하지 않는 인증 방식입니다.',
+        message: MESSAGES.AUTH.COMMON.JWT.NOT_SUPPORTED_TYPE,
       });
     }
     if (!accessToken) {
       return res.status(HTTP_STATUS.UNAUTHORIZED).json({
         status: HTTP_STATUS.UNAUTHORIZED,
-        message: '인증 정보가 없습니다.',
+        message: MESSAGES.AUTH.COMMON.JWT.NO_TOKEN,
       });
     }
 
@@ -35,14 +36,14 @@ export const requireAccessToken = async (req, res, next) => {
       if (error.name === 'TokenExpiredError') {
         return res.status(HTTP_STATUS.UNAUTHORIZED).json({
           status: HTTP_STATUS.UNAUTHORIZED,
-          message: '인증 정보가 만료되었습니다.',
+          message: MESSAGES.AUTH.COMMON.JWT.EXPIRED,
         });
       }
       //그 외 검증실패
       else {
         return res.status(HTTP_STATUS.UNAUTHORIZED).json({
           status: HTTP_STATUS.UNAUTHORIZED,
-          message: '인증 정보가 유효하지 않습니다.',
+          message: MESSAGES.AUTH.COMMON.JWT.INVALID,
         });
       }
     }
@@ -53,7 +54,7 @@ export const requireAccessToken = async (req, res, next) => {
     if (!user) {
       return res.status(HTTP_STATUS.UNAUTHORIZED).json({
         status: HTTP_STATUS.UNAUTHORIZED,
-        message: '인증 정보와 일치하는 사용자가 없습니다.',
+        message: MESSAGES.AUTH.COMMON.JWT.NO_USER,
       });
     }
     req.user = user;

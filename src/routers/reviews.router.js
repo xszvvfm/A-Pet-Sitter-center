@@ -273,48 +273,4 @@ reviewsRouter.delete('/sitters/:sitterId/reviews/:reviewId', requireAccessToken,
   }
 });
 
-//테스트용 예약 구현 api
-reviewsRouter.post('/test/reservations', requireAccessToken, async (req, res, next) => {
-  try {
-      const { sitter_id, date, service_type } = req.body;
-      const user_id = req.user.id;
-
-      // 동일한 날짜에 동일한 펫시터에 대한 예약이 있는지 확인
-      const existingReservation = await prisma.reservation.findFirst({
-          where: {
-              sitterId: parseInt(sitter_id),
-              date: new Date(date),
-          },
-      });
-
-      if (existingReservation) {
-          return res.status(400).json({
-              error: '해당 날짜에 이미 예약이 있습니다. 다른 날짜를 선택해주세요.',
-          });
-      }
-
-      const reservation = await prisma.reservation.create({
-          data: {
-              sitterId: parseInt(sitter_id),
-              userId: user_id,
-              date: new Date(date),
-              service: service_type,
-          },
-      });
-
-      res.status(201).json({
-          message: '예약이 완료되었습니다',
-          reserve_id: reservation.id,
-          user_id: reservation.userId,
-          sitter_id: reservation.sitterId,
-          date: reservation.date.toISOString().split('T')[0], // YYYY-MM-DD 형식으로 반환
-          service_type: reservation.service,
-          created_at: reservation.createdAt,
-          updated_at: reservation.updatedAt,
-      });
-  } catch (error) {
-      next(error);
-  }
-});
-
 export { reviewsRouter };

@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { prisma } from '../utils/prisma.utils.js';
 import { HTTP_STATUS } from '../constants/http-status.constant.js';
+import { MESSAGES } from '../constants/message.constant.js';
 import { REFRESH_TOKEN_SECRET } from '../constants/env.constants.js';
 
 export const requireRefreshToken = async (req, res, next) => {
@@ -11,20 +12,20 @@ export const requireRefreshToken = async (req, res, next) => {
     if (!authorization) {
       return res.status(HTTP_STATUS.UNAUTHORIZED).json({
         status: HTTP_STATUS.UNAUTHORIZED,
-        message: '인증 정보가 없습니다.',
+        message: MESSAGES.AUTH.COMMON.JWT.NO_TOKEN,
       });
     }
     const [type, refreshToken] = authorization.split(' ');
     if (type !== 'Bearer') {
       return res.status(HTTP_STATUS.UNAUTHORIZED).json({
         status: HTTP_STATUS.UNAUTHORIZED,
-        message: '지원하지 않는 인증 방식입니다.',
+        message: MESSAGES.AUTH.COMMON.JWT.NOT_SUPPORTED_TYPE,
       });
     }
     if (!refreshToken) {
       return res.status(HTTP_STATUS.UNAUTHORIZED).json({
         status: HTTP_STATUS.UNAUTHORIZED,
-        message: '인증 정보가 없습니다.',
+        message: MESSAGES.AUTH.COMMON.JWT.NO_TOKEN,
       });
     }
 
@@ -36,14 +37,14 @@ export const requireRefreshToken = async (req, res, next) => {
       if (error.name === 'TokenExpiredError') {
         return res.status(HTTP_STATUS.UNAUTHORIZED).json({
           status: HTTP_STATUS.UNAUTHORIZED,
-          message: '인증 정보가 만료되었습니다.',
+          message: MESSAGES.AUTH.COMMON.JWT.EXPIRED,
         });
       }
       //그 외 검증실패
       else {
         return res.status(HTTP_STATUS.UNAUTHORIZED).json({
           status: HTTP_STATUS.UNAUTHORIZED,
-          message: '인증 정보가 유효하지 않습니다.',
+          message: MESSAGES.AUTH.COMMON.UNAUTHORIZED,
         });
       }
     }
@@ -58,7 +59,7 @@ export const requireRefreshToken = async (req, res, next) => {
     if (!isValidRefreshToken) {
       return res.status(HTTP_STATUS.UNAUTHORIZED).json({
         status: HTTP_STATUS.UNAUTHORIZED,
-        message: '폐기된 인증 정보입니다.',
+        message: MESSAGES.AUTH.COMMON.JWT.EXPIRED,
       });
     }
     const user = await prisma.user.findUnique({
@@ -67,7 +68,7 @@ export const requireRefreshToken = async (req, res, next) => {
     if (!user) {
       return res.status(HTTP_STATUS.UNAUTHORIZED).json({
         status: HTTP_STATUS.UNAUTHORIZED,
-        message: '인증 정보와 일치하는 사용자가 없습니다.',
+        message: MESSAGES.AUTH.COMMON.JWT.NO_USER,
       });
     }
 
