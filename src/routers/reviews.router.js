@@ -268,11 +268,10 @@ reviewsRouter.delete(
         where: { id: parseInt(reviewId, 10) },
       });
 
-      return res.status(200).json({ message: '리뷰가 삭제되었습니다.' });
-    } catch (error) {
-      next(error); // 에러를 핸들러로 전달
-    }
-  },
-);
+    return res.status(200).json({ message: '리뷰가 삭제되었습니다.' });
+  } catch (error) {
+    next(error); // 에러를 핸들러로 전달
+  }
+});
 
 export { reviewsRouter };

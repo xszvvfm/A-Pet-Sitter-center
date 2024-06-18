@@ -1,10 +1,14 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { HTTP_STATUS } from '../constants/http-status.constant.js';
+import { MESSAGES } from '../constants/message.constant.js';
 import {ACCESS_TOKEN_SECRET,REFRESH_TOKEN_SECRET,} from '../constants/env.constants.js';
 import { prisma } from '../utils/prisma.utils.js';
 import { requireRefreshToken } from '../middlewares/require-refresh-token.middleware.js';
-
+import { authConstant } from '../constants/auth.constant.js';
+//import { signInValidator } from '../middlewares/validators/sign-in-validator.middleware.js';
+//import { signUpValidator } from '../middlewares/validators/sign-up-validator.middleware.js';
 const authRouter = express.Router();
 
 
@@ -16,14 +20,14 @@ authRouter.post('/sign-up', async (req, res, next) => {
       where: { email },
     });
     if (existedUser) {
-      return res.status(400).json({ message: '이미 가입 된 사용자입니다.' });
+      return res.status(HTTP_STATUS.CONFLICT).json({ message: MESSAGES.AUTH.COMMON.EMAIL.DUPLICATED});
     }
     if (password !== passwordConfirm) {
       return res
-        .status(400)
-        .json({ message: '비밀번호 값이 일치하지 않습니다.' });
+        .status(HTTP_STATUS.BAD_REQUEST)
+        .json({ message: MESSAGES.AUTH.COMMON.PASSWORD_CONFIRM.NOT_MACHTED_PASSWORD });
     }
-    const hassedPassword = bcrypt.hashSync(password, 10);
+    const hassedPassword = bcrypt.hashSync(password, authConstant.HASH_SALT_ROUNDS);
     const { _password, ...user } = await prisma.user.create({
       data: {
         email,
@@ -31,7 +35,7 @@ authRouter.post('/sign-up', async (req, res, next) => {
         username,
       },
     });
-    res.status(201).json({ status: 200, message: '회원가입에 성공했습니다.' });
+    res.status(HTTP_STATUS.OK).json({ status: HTTP_STATUS.OK, message: MESSAGES.AUTH.SIGN_UP.SUCCEED});
   } catch (error) {
     next(error);
   }
@@ -45,17 +49,17 @@ authRouter.post('/sign-in', async (req, res, next) => {
       where: { email },
     });
     if (!user) {
-      return res.status(400).json({ message: '가입되지 않은 이메일입니다.' });
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: MESSAGES.AUTH.SIGN_IN.NOT_USER});
     }
     const passwordCheck = bcrypt.compareSync(password, user.password);
     if (!passwordCheck) {
-      return res.status(400).json({ message: '비밀번호를 확인해주세요.' });
+      return res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: MESSAGES.AUTH.COMMON.PASSWORD_CONFIRM.NOT_MACHTED_PASSWORD});
     }
     const payload = { id: user.id };
     const data = await generateAuthTokens(payload);
     return res
-      .status(200)
-      .json({ status: 200, message: '로그인에 성공하였습니다.', data });
+      .status(HTTP_STATUS.OK)
+      .json({ status: HTTP_STATUS.OK, message: MESSAGES.AUTH.SIGN_IN.SUCCEED, data });
   } catch (error) {
     next(error);
   }
@@ -68,8 +72,8 @@ authRouter.post('/token', requireRefreshToken, async (req, res, next) => {
     const data = await generateAuthTokens(payload);
 
     return res
-      .status(200)
-      .json({ status: 200, message: '토큰이 발급되었습니다', data });
+      .status(HTTP_STATUS.OK)
+      .json({ status: HTTP_STATUS.OK, message: MESSAGES.AUTH.TOKEN.SUCCEED, data });
   } catch (error) {
     next(error);
   }
@@ -84,10 +88,10 @@ authRouter.post('/sign-out', requireRefreshToken, async (req, res, next) => {
       data: { token: null },
     });
     return res
-      .status(200)
+      .status(HTTP_STATUS.OK)
       .json({
-        status: 200,
-        message: '로그아웃 하였습니다.',
+        status: HTTP_STATUS.OK,
+        message: MESSAGES.AUTH.SIGN_OUT.SUCCEED,
         data: { id: user.id },
       });
   } catch (error) {
