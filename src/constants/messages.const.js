@@ -46,9 +46,16 @@ export const MESSAGES = {
     },
     READ: {
       IS_NOT_RESERVATION: '없는 예약정보입니다.',
+      SUCCED: '예약조회에 성공했습니다.',
     },
     UPDATE: {
       SUCCED: '예약수정이 완료되었습니다.',
+    },
+    COMMON: {
+      NOT_FOUND: '예약이 존재하지 않습니다.',
+    },
+    DELETE: {
+      SUCCEED: '예약 삭제에 성공했습니다.',
     },
   },
   REVIEW: {

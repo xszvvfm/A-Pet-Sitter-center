@@ -1,44 +1,44 @@
-import { HttpError } from '../errors/httperror.js';
-import { MESSAGES } from '../constants/message.constant.js';
-import { HTTP_STATUS } from '../constants/http-status.constant.js';
-import { prisma } from '@prisma/client';
+import { reservationsRepository } from '../repositories/reservations.repository.js';
+
 export class reservationService {
-  update = async ({ sitter_id, date }) => {
+  reservationsRepository = new reservationsRepository();
+
+    //
+    getReservationById = async(reserveId)
+     const data = await this.reservation.findUnique(reserveId);
+      if (!data) {
+        return res.status(HTTP_STATUS.NOT_FOUND).json({
+          status: HTTP_STATUS.NOT_FOUND,
+          message: MESSAGES.RESERVATION.READ.IS_NOT_RESERVATION,
+        });
+      }
+
+      return data = {
+        user_id: data.userId,
+        sitter_id: data.sitterId,
+        reserve_id: data.reserveId,
+        date: data.date,
+        service_type: data.service_type,
+        created_at: data.createdAt,
+        updated_at: data.updatedAt,
+
+        // user_id,
+        // sitter_id,
+        // reserve_id,
+        // date,
+        // service_type,
+        // created_at,
+        // updated_at,
+      };
+    //
+  update = async (id, sitter_id, date, service) => {
     //있는 예약인지 확인하기 : service
-    const existReservation = await prisma.reservation.findUnique({
-      where: {
-        id: sitter_id,
-        date: date,
-      },
-
-      //service,
-    });
-    if (!existReservation) {
-      //아래에 넣을 내용 HttpError.
-      throw new HttpError.HTTP_STATUS.CONFLICT(
-        MESSAGES.RESERVATION.READ.IS_NOT_RESERVATION,
-      );
-    }
-
-    //서비스타입
-    const validServiceTypes = Object.values(service);
-
-    if (!validServiceTypes.includes(service)) {
-      res.status(HTTP_STATUS.BAD_REQUEST).json({
-        status: HTTP_STATUS.BAD_REQUEST,
-        message: MESSAGES.RESERVATION.INVALID_SERVICE_TYPE,
-      });
-      return;
-    }
-    const patchResevation = await prisma.reservation.update({
-      where: {
-        id: sitter_id,
-        date: date,
-      },
-      patchResevation: {
-        ...(sitter_id && { sitter_id }),
-        ...(date && { date }),
-      },
-    });
+    const patchResevation = await this.reservationsRepository.update(
+      id,
+      sitter_id,
+      date,
+      service,
+    );
+    return patchResevation;
   };
 }

@@ -1,6 +1,6 @@
 import express from 'express';
 import { HTTP_STATUS } from '../constants/http-status.constant.js';
-import { MESSAGES } from '../constants/message.constant.js';
+import { MESSAGES } from '../constants/messages.const.js';
 import { prisma } from '../utils/prisma.utils.js';
 import { updateReservationValidator } from '../middlewares/reservation.validators/update.reservation.validators.middleware.js';
 
@@ -56,7 +56,47 @@ reservationsRouter.get('/', async (req, res) => {
       .json({ error: '예약을 조회할 수 없습니다.' });
   }
 });
+//------//
+//예약 상세조회 : 미들웨어 만들기
+reservationsRouter.get('/:reserveId', async (req, res, next) => {
+  const { reserveId } = req.params;
+  try {
+    let data = await prisma.reservation.findUnique({
+      where: +reserveId,
+    });
+    if (!data) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({
+        status: HTTP_STATUS.NOT_FOUND,
+        message: MESSAGES.RESERVATION.READ.IS_NOT_RESERVATION,
+      });
+    }
 
+    data = {
+      user_id: data.userId,
+      sitter_id: data.sitterId,
+      reserve_id: data.reserveId,
+      date: data.date,
+      service_type: data.service_type,
+      created_at: data.createdAt,
+      updated_at: data.updatedAt,
+
+      // user_id,
+      // sitter_id,
+      // reserve_id,
+      // date,
+      // service_type,
+      // created_at,
+      // updated_at,
+    };
+
+    return res.status(HTTP_STATUS.OK).json({
+      status: HTTP_STATUS.OK,
+      message: MESSAGES.RESERVATION.READ.SUCCED,
+    });
+  } catch (error) {
+    next();
+  }
+});
 //------//
 
 //예약수정 url 라우터 연결 어떻게 할건지
@@ -90,8 +130,8 @@ reservationsRouter.patch(
         where: {
           id: sitter_id,
           date: date,
+          service: service,
         },
-        id,
 
         //service,
       });
@@ -117,16 +157,6 @@ reservationsRouter.patch(
       // }
       // //예약날짜 찾기 : 해당 펫시터의 예약 가능한 날짜
 
-      //서비스타입
-      const validServiceTypes = Object.values(service);
-
-      if (!validServiceTypes.includes(service)) {
-        res.status(HTTP_STATUS.BAD_REQUEST).json({
-          status: HTTP_STATUS.BAD_REQUEST,
-          message: MESSAGES.RESERVATION.INVALID_SERVICE_TYPE,
-        });
-        return;
-      }
       const patchResevation = await prisma.reservation.update({
         where: {
           id: sitter_id,
