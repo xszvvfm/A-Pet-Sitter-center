@@ -11,34 +11,41 @@ reviewsRouter.post('/sitters/:sitterId/reviews', requireAccessToken, async (req,
   const { comment, rating, reservationId } = req.body;
   const userId = req.user.id; // 미들웨어에서 가져온 유저 ID
 
-  if (!comment || !rating || !reservationId) {
-      return res.status(400).json({ error: 'comment, rating, reservationId는 필수 입력사항입니다.' });
-  }
+    if (!comment || !rating || !reservationId) {
+      return res.status(400).json({
+        error: 'comment, rating, reservationId는 필수 입력사항입니다.',
+      });
+    }
 
-  try {
+    try {
       // 예약 정보를 가져와서 예약 날짜와 펫시터 ID를 확인
       const reservation = await prisma.reservation.findUnique({
-          where: { id: parseInt(reservationId, 10) },
-          include: { petSitter: true },
+        where: { id: parseInt(reservationId, 10) },
+        include: { petSitter: true },
       });
 
       if (!reservation) {
-          return res.status(404).json({ error: '해당 예약을 찾을 수 없습니다.' });
+        return res.status(404).json({ error: '해당 예약을 찾을 수 없습니다.' });
       }
 
-      if (reservation.userId !== userId || reservation.sitterId !== parseInt(sitterId, 10)) {
-          return res.status(403).json({ error: '해당 예약에 대한 리뷰를 작성할 권한이 없습니다.' });
+      if (
+        reservation.userId !== userId ||
+        reservation.sitterId !== parseInt(sitterId, 10)
+      ) {
+        return res
+          .status(403)
+          .json({ error: '해당 예약에 대한 리뷰를 작성할 권한이 없습니다.' });
       }
 
       const date = new Date(reservation.date.toISOString().split('T')[0]); // 예약 날짜 가져오기
 
       // 동일한 날짜에 동일한 사용자와 펫시터에 대한 리뷰가 있는지 확인
       const existingReview = await prisma.review.findFirst({
-          where: {
-              userId: userId,
-              sitterId: parseInt(sitterId, 10),
-              date: date,
-          },
+        where: {
+          userId: userId,
+          sitterId: parseInt(sitterId, 10),
+          date: date,
+        },
       });
 
       if (existingReview) {
@@ -46,22 +53,22 @@ reviewsRouter.post('/sitters/:sitterId/reviews', requireAccessToken, async (req,
       }
 
       const review = await prisma.review.create({
-          data: {
-              date: date,
-              rating: parseInt(rating, 10),
-              comment,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-              petSitter: {
-                  connect: { id: parseInt(sitterId, 10) }
-              },
-              user: {
-                  connect: { id: userId }
-              },
-              reservation: {
-                  connect: { id: parseInt(reservationId, 10) }
-              }
+        data: {
+          date: date,
+          rating: parseInt(rating, 10),
+          comment,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          petSitter: {
+            connect: { id: parseInt(sitterId, 10) },
           },
+          user: {
+            connect: { id: userId },
+          },
+          reservation: {
+            connect: { id: parseInt(reservationId, 10) },
+          },
+        },
       });
 
       res.status(201).json({
@@ -79,8 +86,9 @@ reviewsRouter.post('/sitters/:sitterId/reviews', requireAccessToken, async (req,
     });
   } catch (error) {
       next(error);
-  }
-});
+    }
+  },
+);
 
 //내가 작성한 리뷰조회 api
 reviewsRouter.get('/reviews/my', requireAccessToken, async (req, res, next) => {
@@ -99,9 +107,9 @@ reviewsRouter.get('/reviews/my', requireAccessToken, async (req, res, next) => {
         },
       });
 
-      if (reviews.length === 0) {
-          return res.status(404).json({ error: '리뷰를 찾을 수 없습니다.' });
-      }
+    if (reviews.length === 0) {
+      return res.status(404).json({ error: '리뷰를 찾을 수 없습니다.' });
+    }
 
       const formattedReviews = reviews.map(review => ({
 
@@ -116,15 +124,14 @@ reviewsRouter.get('/reviews/my', requireAccessToken, async (req, res, next) => {
           updated_at: review.updatedAt,
       }));
 
-      return res.status(200).json({
-          message: '리뷰를 조회했습니다.',
-          reviews: formattedReviews,
-      });
+    return res.status(200).json({
+      message: '리뷰를 조회했습니다.',
+      reviews: formattedReviews,
+    });
   } catch (error) {
-      next(error); // 에러를 핸들러로 전달
+    next(error); // 에러를 핸들러로 전달
   }
 });
-
 
 //해당펫시터의 리뷰 전체 조회 api
 reviewsRouter.get('/sitters/:sitterId/reviews', async (req, res, next) => {
