@@ -1,12 +1,12 @@
 // src/routers/reviews.router.js
-import { Router } from 'express';
+import express from 'express';
 import { prisma } from '../utils/prisma.utils.js';
 import { requireAccessToken } from '../middlewares/require-access-token.middleware.js';
 
-const router = Router();
+const reviewsRouter = express.Router()
 
 //리뷰 생성 api(미들웨어추가로 id를 입력받고 예약id를 body로 입력받아 date값을 받아오도록 수정이 필요함)
-router.post('/sitters/:sitterId/reviews', requireAccessToken, async (req, res, next) => {
+reviewsRouter.post('/sitters/:sitterId/reviews', requireAccessToken, async (req, res, next) => {
   const { sitterId } = req.params;
   const { comment, rating, reservationId } = req.body;
   const userId = req.user.id; // 미들웨어에서 가져온 유저 ID
@@ -42,7 +42,7 @@ router.post('/sitters/:sitterId/reviews', requireAccessToken, async (req, res, n
       });
 
       if (existingReview) {
-          return res.status(400).json({ error: '이미 해당 날짜에 리뷰를 작성하셨습니다.' });
+          return res.status(400).json({ error: '이미 리뷰를 작성하였습니다.' });
       }
 
       const review = await prisma.review.create({
@@ -65,23 +65,25 @@ router.post('/sitters/:sitterId/reviews', requireAccessToken, async (req, res, n
       });
 
       res.status(201).json({
-          id: review.id,
-          sitterId: review.sitterId,
-          userId: review.userId,
-          date: review.date.toISOString().split('T')[0], // YYYY-MM-DD 형식으로 반환
-          rating: review.rating,
-          comment: review.comment,
-          createdAt: review.createdAt,
-          updatedAt: review.updatedAt,
-          reservationId: review.reservationId,
-      });
+        message: "성공적으로 리뷰작성 되었습니다",
+        date: review.date.toISOString().split('T')[0], // YYYY-MM-DD 형식으로 반환
+        service_type: reservation.service,
+        review_id: review.id,
+        sitter_id: review.sitterId,
+        user_id: review.userId,
+        comment: review.comment,
+        rating: review.rating,
+        created_at: review.createdAt,
+        updated_at: review.updatedAt,
+        reservation_id: review.reservationId,
+    });
   } catch (error) {
       next(error);
   }
 });
 
 //내가 작성한 리뷰조회 api
-router.get('/reviews/my', requireAccessToken, async (req, res, next) => {
+reviewsRouter.get('/reviews/my', requireAccessToken, async (req, res, next) => {
   const userId = req.user.id; // 미들웨어에서 가져온 유저 ID
 
   try {
@@ -91,7 +93,10 @@ router.get('/reviews/my', requireAccessToken, async (req, res, next) => {
           include: {
               petSitter: true,
               user: true,
-          },
+              reservation: true,
+          }, orderBy: {
+            date: 'desc', // date 기준 내림차순 정렬
+        },
       });
 
       if (reviews.length === 0) {
@@ -99,10 +104,12 @@ router.get('/reviews/my', requireAccessToken, async (req, res, next) => {
       }
 
       const formattedReviews = reviews.map(review => ({
+
+          date: review.date.toISOString().split('T')[0], // YYYY-MM-DD 형식으로 변환
+          service_type: review.reservation?.service,
           review_id: review.id,
           sitter_id: review.sitterId,
           user_id: review.userId,
-          date: review.date.toISOString().split('T')[0], // YYYY-MM-DD 형식으로 변환
           comment: review.comment,
           rating: review.rating,
           created_at: review.createdAt,
@@ -120,7 +127,7 @@ router.get('/reviews/my', requireAccessToken, async (req, res, next) => {
 
 
 //해당펫시터의 리뷰 전체 조회 api
-router.get('/sitters/:sitterId/reviews', async (req, res, next) => {
+reviewsRouter.get('/sitters/:sitterId/reviews', async (req, res, next) => {
   const { sitterId } = req.params;
 
   try {
@@ -130,6 +137,7 @@ router.get('/sitters/:sitterId/reviews', async (req, res, next) => {
       include: {
         petSitter: true,
         user: true,
+        reservation: true,
       },
       orderBy: {
         id: 'desc',
@@ -146,6 +154,7 @@ router.get('/sitters/:sitterId/reviews', async (req, res, next) => {
       message: '리뷰 목록을 조회했습니다.',
       reviews: reviews.map((review) => ({
         date: review.date.toISOString().split('T')[0], // YYYY-MM-DD 형식으로 변환
+        service_type: review.reservation?.service,
         review_id: review.id,
         sitter_id: review.sitterId,
         user_id: review.userId,
@@ -161,135 +170,144 @@ router.get('/sitters/:sitterId/reviews', async (req, res, next) => {
 });
 
 //리뷰 수정 api(미들웨어에서 엑세스토큰으로 유저id를 받아오도록 수정필요 date를 위해 예약id도 추후 body로 받아오도록 수정필요)
-
-router.patch('/sitters/:sitterId/reviews/:reviewId', async (req, res, next) => {
+reviewsRouter.patch('/sitters/:sitterId/reviews/:reviewId', requireAccessToken, async (req, res, next) => {
   const { sitterId, reviewId } = req.params;
   const { re_comment, re_rating } = req.body;
-
-  // 나중에 액세스 토큰에서 유저 ID를 가져오도록 수정 필요
-  const userId = 2; // 임시 유저 ID
+  const userId = req.user.id; // 미들웨어에서 가져온 유저 ID
 
   if (!re_comment && !re_rating) {
-    return res
-      .status(400)
-      .json({
-        error: 're_comment 또는 re_rating 중 하나는 필수 입력사항입니다',
+      return res.status(400).json({
+          error: 're_comment 또는 re_rating 중 하나는 필수 입력사항입니다',
       });
   }
 
   try {
-    // 리뷰 ID로 리뷰를 조회
-    const review = await prisma.review.findUnique({
-      where: { id: parseInt(reviewId, 10) },
-    });
+      // 리뷰 ID로 리뷰를 조회
+      const review = await prisma.review.findUnique({
+          where: { id: parseInt(reviewId, 10) 
+            
+          },include: {
+            reservation: true, // 업데이트 후 예약 정보 포함
+        },
+      });
 
-    if (!review) {
-      return res.status(404).json({ error: '리뷰를 찾을 수 없습니다.' });
-    }
+      if (!review) {
+          return res.status(404).json({ error: '리뷰를 찾을 수 없습니다.' });
+      }
 
-    if (
-      review.sitterId !== parseInt(sitterId, 10) ||
-      review.userId !== userId
-    ) {
-      return res
-        .status(403)
-        .json({ error: '본인의 리뷰만 삭제할 수 있습니다.' });
-    }
+      if (review.sitterId !== parseInt(sitterId, 10) || review.userId !== userId) {
+          return res.status(403).json({ error: '본인의 리뷰만 수정할 수 있습니다.' });
+      }
 
-    // 업데이트할 데이터 객체 생성
-    const data = {};
-    if (re_comment) data.comment = re_comment;
-    if (re_rating) data.rating = parseInt(re_rating, 10);
-    data.updatedAt = new Date();
+      // 업데이트할 데이터 객체 생성
+      const data = {};
+      if (re_comment) data.comment = re_comment;
+      if (re_rating) data.rating = parseInt(re_rating, 10);
+      data.updatedAt = new Date();
 
-    // 리뷰 업데이트
-    const updatedReview = await prisma.review.update({
-      where: { id: parseInt(reviewId, 10) },
-      data: data,
-    });
+      // 리뷰 업데이트
+      const updatedReview = await prisma.review.update({
+          where: { id: parseInt(reviewId, 10) },
+          data: data,
+          include: {
+            reservation: true, // 업데이트 후 예약 정보 포함
+        },
+      });
 
-    return res.status(200).json({
-      reserve_id: updatedReview.id,
-      sitter_id: updatedReview.sitterId,
-      user_id: updatedReview.userId,
-      rating: updatedReview.rating,
-      comment: updatedReview.comment,
-      created_at: updatedReview.createdAt,
-      updated_at: updatedReview.updatedAt,
-    });
+      return res.status(200).json({
+          message: '리뷰가 성공적으로 수정되었습니다',
+          date: updatedReview.reservation.date.toISOString().split('T')[0],
+          service_type: updatedReview.reservation.service,
+          reserve_id: updatedReview.id,
+          sitter_id: updatedReview.sitterId,
+          user_id: updatedReview.userId,
+          rating: updatedReview.rating,
+          comment: updatedReview.comment,
+          created_at: updatedReview.createdAt,
+          updated_at: updatedReview.updatedAt,
+      });
   } catch (error) {
-    next(error); // 에러를 핸들러로 전달
+      next(error); // 에러를 핸들러로 전달
   }
 });
 
 //리뷰 삭제 api (미들웨어에서 엑세스토큰으로 유저id를 받아오도록 수정필요)
-router.delete(
-  '/sitters/:sitterId/reviews/:reviewId',
-  async (req, res, next) => {
-    const { sitterId, reviewId } = req.params;
+reviewsRouter.delete('/sitters/:sitterId/reviews/:reviewId', requireAccessToken, async (req, res, next) => {
+  const { sitterId, reviewId } = req.params;
+  const userId = req.user.id; // 미들웨어에서 가져온 유저 ID
 
-    // 나중에 액세스 토큰에서 유저 ID를 가져오도록 수정 필요
-    const userId = 2; // 임시 유저 ID
-
-    try {
+  try {
       // 리뷰 ID로 리뷰를 조회
       const review = await prisma.review.findUnique({
-        where: { id: parseInt(reviewId, 10) },
+          where: { id: parseInt(reviewId, 10) },
       });
 
       if (!review) {
         return res.status(404).json({ error: '리뷰를 찾을 수 없습니다.' });
       }
 
-      if (
-        review.sitterId !== parseInt(sitterId, 10) ||
-        review.userId !== userId
-      ) {
-        return res
-          .status(403)
-          .json({ error: '본인의 리뷰만 삭제할 수 있습니다' });
+      if (review.sitterId !== parseInt(sitterId, 10)) {
+          return res.status(404).json({ error: '해당 펫시터의 리뷰가 없습니다.' });
       }
+
+      if (review.userId !== userId) {
+          return res.status(403).json({ error: '본인의 리뷰만 삭제할 수 있습니다.' });
+      }
+
 
       // 리뷰 삭제
       await prisma.review.delete({
-        where: { id: parseInt(reviewId, 10) },
+          where: { id: parseInt(reviewId, 10) },
       });
 
       return res.status(200).json({ message: '리뷰가 삭제되었습니다.' });
-    } catch (error) {
-      next(error); // 에러를 핸들러로 전달
-    }
-  },
-);
-
-//테스트용 예약 구현 api
-router.post('/reservations', requireAccessToken, async (req, res, next) => {
-  try {
-    const { sitter_id, date, service_type } = req.body;
-    const user_id = req.user.id;
-
-    const reservation = await prisma.reservation.create({
-      data: {
-        sitterId: parseInt(sitter_id),
-        userId: user_id,
-        date: new Date(date),
-        service: service_type,
-      },
-    });
-
-    res.status(201).json({
-      message: '예약이 완료되었습니다',
-      reserve_id: reservation.id,
-      user_id: reservation.userId,
-      sitter_id: reservation.sitterId,
-      date: reservation.date.toISOString().split('T')[0], // YYYY-MM-DD 형식으로 반환
-      service_type: reservation.service,
-      created_at: reservation.createdAt,
-      updated_at: reservation.updatedAt,
-    });
   } catch (error) {
-    next(error);
+      next(error); // 에러를 핸들러로 전달
   }
 });
 
-export default router;
+//테스트용 예약 구현 api
+reviewsRouter.post('/test/reservations', requireAccessToken, async (req, res, next) => {
+  try {
+      const { sitter_id, date, service_type } = req.body;
+      const user_id = req.user.id;
+
+      // 동일한 날짜에 동일한 펫시터에 대한 예약이 있는지 확인
+      const existingReservation = await prisma.reservation.findFirst({
+          where: {
+              sitterId: parseInt(sitter_id),
+              date: new Date(date),
+          },
+      });
+
+      if (existingReservation) {
+          return res.status(400).json({
+              error: '해당 날짜에 이미 예약이 있습니다. 다른 날짜를 선택해주세요.',
+          });
+      }
+
+      const reservation = await prisma.reservation.create({
+          data: {
+              sitterId: parseInt(sitter_id),
+              userId: user_id,
+              date: new Date(date),
+              service: service_type,
+          },
+      });
+
+      res.status(201).json({
+          message: '예약이 완료되었습니다',
+          reserve_id: reservation.id,
+          user_id: reservation.userId,
+          sitter_id: reservation.sitterId,
+          date: reservation.date.toISOString().split('T')[0], // YYYY-MM-DD 형식으로 반환
+          service_type: reservation.service,
+          created_at: reservation.createdAt,
+          updated_at: reservation.updatedAt,
+      });
+  } catch (error) {
+      next(error);
+  }
+});
+
+export { reviewsRouter };
