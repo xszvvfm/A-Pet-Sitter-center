@@ -7,7 +7,7 @@ import { updateReservationValidator } from '../middlewares/reservation.validator
 
 const reservationRouter = express.Router();
 
-const reservationController = new reservationController();
+// const reservationController = new reservationController();
 
 //예약수정 url 라우터 연결 어떻게 할건지
 reservationRouter.patch(
