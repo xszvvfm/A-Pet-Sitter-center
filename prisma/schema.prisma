@@ -63,7 +63,7 @@ model Review {
   comment       String
   createdAt     DateTime     @default(now()) @map("created_at")
   updatedAt     DateTime     @updatedAt @map("updated_at")
-  reservationId Int          @unique @map("reservation_id")
+  reservationId Int?          @unique @map("reservation_id")
   reservation   Reservation? @relation(fields: [reservationId], references: [id])
   petSitter     PetSitter    @relation(fields: [sitterId], references: [id])
   user          User         @relation(fields: [userId], references: [id])
