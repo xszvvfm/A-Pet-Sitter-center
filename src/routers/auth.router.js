@@ -2,8 +2,9 @@ import express from 'express'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET} from '../constants/env.constants.js';
-import { prisma } from '../utils/prisma.util.js';
+import { prisma } from '../utils/prisma.utils.js';
 import { requireRefreshToken } from '../middlewares/require-refresh-token.middleware.js';
+
 
 const authRouter =express.Router();
 

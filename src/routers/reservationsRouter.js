@@ -29,7 +29,7 @@ router.post('/', async (req, res) => {
     console.error('예약 생성 실패:', error);
     res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: '예약을 생성할 수 없습니다.' });
   }
-});a
+});
 
 // 예약 조회 API
 router.get('/', async (req, res) => {

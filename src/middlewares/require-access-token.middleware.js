@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import {prisma} from '../utils/prisma.util.js';
+import {prisma} from '../utils/prisma.utils.js';
 import { HTTP_STATUS } from '../constants/http-status.constant.js';
 import { ACCESS_TOKEN_SECRET } from '../constants/env.constants.js';
 
