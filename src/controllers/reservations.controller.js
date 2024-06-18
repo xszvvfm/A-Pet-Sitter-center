@@ -19,7 +19,7 @@ export class reservationsController {
       //있는 예약인지 확인하기 : service
 
       //-----//가져올 아이디 등 어떻게 가져올지 다시 보기
-      const data = await reservationService.update({
+      const patchResevation = await reservationService.update({
         id,
         sitter_id,
         date,
@@ -29,7 +29,7 @@ export class reservationsController {
       return res.status(HTTP_STATUS.OK).json({
         status: HTTP_STATUS.OK,
         message: MESSAGES.RESERVATION.UPDATE.SUCCED,
-        data,
+        patchResevation,
       });
     } catch (error) {
       // next(error);
