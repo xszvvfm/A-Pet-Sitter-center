@@ -3,15 +3,19 @@ import { authConstant } from './auth.constant.js';
 export const MESSAGES = {
   RESERVATIONS: {
     COMMON: {
-      // SITTER_ID: {
-      //   REQUIRED: 'sitterId를 입력해 주세요.',
-      // },
-      // DATE: {
-      //   REQUIRED: '날짜를 입력해 주세요.',
-      // },
-      // SERVICE: {
-      //   REQUIRED: '서비스를 입력해 주세요.',
-      // },
+      SITTER_ID: {
+        REQUIRED: 'sitterId를 입력해 주세요.',
+        NUMBER_BASE: 'sitterId는 숫자여야 합니다.',
+        INTEGER: 'sitterId는 정수여야 합니다.',
+        INVALID: '유효하지 않은 sitterId 입니다.',
+      },
+      DATE: {
+        REQUIRED: '날짜를 입력해 주세요.',
+        DATE_BASE: '날짜는 유효한 날짜여야 합니다.',
+      },
+      SERVICE: {
+        REQUIRED: '서비스를 입력해 주세요.',
+      },
       NOT_FOUND: '예약이 존재하지 않습니다.',
     },
     CREATE: {

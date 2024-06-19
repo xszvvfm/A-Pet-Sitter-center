@@ -1,9 +1,10 @@
 import express from 'express';
-import { HTTP_STATUS } from '../constants/http-status.constant.js';
-import { MESSAGES } from '../constants/message.constant.js';
+// import { HTTP_STATUS } from '../constants/http-status.constant.js';
+// import { MESSAGES } from '../constants/message.constant.js';
 import { prisma } from '../utils/prisma.utils.js';
+import { createReservationValidator } from '../middlewares/validators/create-reservation-validator.middleware.js';
 import { updateReservationValidator } from '../middlewares/validators/update.reservation.validators.middleware.js';
-import { requireAccessToken } from '../middlewares/require-access-token.middleware.js';
+// import { requireAccessToken } from '../middlewares/require-access-token.middleware.js';
 import { ReservationsController } from '../controllers/reservations.controller.js';
 import { ReservationsService } from '../services/reservations.service.js';
 import { ReservationsRepository } from '../repositories/reservations.repository.js';
@@ -17,7 +18,7 @@ const reservationsController = new ReservationsController(reservationsService);
 /** 예약 생성 API **/
 reservationsRouter.post(
   '/',
-  // requireAccessToken,
+  createReservationValidator,
   reservationsController.create,
 );
 
@@ -116,6 +117,6 @@ reservationsRouter.patch(
 //------//
 
 /** 예약 삭제 API **/
-reservationsRouter.delete('/:reserveId', reservationsController.delete);
+reservationsRouter.delete('/:id', reservationsController.delete);
 
 export { reservationsRouter };
