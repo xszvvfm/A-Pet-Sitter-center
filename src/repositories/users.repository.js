@@ -47,7 +47,7 @@ export class UsersRepository {
 
     upsertRefreshToken = async (userId, refreshToken) => {
         const hashedRefreshToken = bcrypt.hashSync(refreshToken, 10);
-        await this.prisma.refreshToken.upsert({
+        const token = await this.prisma.refreshToken.upsert({
             where: {
               userId,
             },
@@ -59,5 +59,6 @@ export class UsersRepository {
               token: hashedRefreshToken,
             },
           });
+      return token;  
     }
 }
