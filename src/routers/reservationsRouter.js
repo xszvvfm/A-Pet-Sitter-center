@@ -1,6 +1,6 @@
 import express from 'express';
 import { HTTP_STATUS } from '../constants/http-status.constant.js';
-import { MESSAGES } from '../constants/messages.const.js';
+import { MESSAGES } from '../constants/message.constant.js';
 import { prisma } from '../utils/prisma.utils.js';
 import { updateReservationValidator } from '../middlewares/validators/update.reservation.validators.middleware.js';
 import { requireAccessToken } from '../middlewares/require-access-token.middleware.js';
