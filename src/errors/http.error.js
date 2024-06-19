@@ -1,4 +1,3 @@
-
 import { HTTP_STATUS } from '../constants/http-status.constant.js';
 
 class BadRequest {
