@@ -13,7 +13,11 @@ export class UsersRepository {
               password: hassedPassword,
               username,
             },
-           
+            select: {
+              id: true,
+              email: true,
+              username: true,
+            },
           });
         return user;
     }
