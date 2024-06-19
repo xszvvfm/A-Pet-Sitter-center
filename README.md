@@ -25,3 +25,9 @@ yarn start
 ```sh
 yarn dev
 ```
+
+- prisma 초기화후 업데이트
+
+```sh
+npx prisma db push --force-reset
+```

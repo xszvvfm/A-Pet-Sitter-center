@@ -1,9 +1,10 @@
 import jwt from 'jsonwebtoken';
-import { prisma } from '../utils/prisma.utils.js';
 import { HTTP_STATUS } from '../constants/http-status.constant.js';
 import { ACCESS_TOKEN_SECRET } from '../constants/env.constants.js';
 import { MESSAGES } from '../constants/message.constant.js';
+import { UsersRepository } from '../repositories/users.repository.js';
 
+const usersRepository = new UsersRepository();
 export const requireAccessToken = async (req, res, next) => {
   try {
     const authorization = req.headers.authorization;
@@ -48,9 +49,7 @@ export const requireAccessToken = async (req, res, next) => {
       }
     }
     const { id } = payload;
-    const user = await prisma.user.findUnique({
-      where: { id },
-    });
+    const user = await usersRepository.readOneById(id);
     if (!user) {
       return res.status(HTTP_STATUS.UNAUTHORIZED).json({
         status: HTTP_STATUS.UNAUTHORIZED,
