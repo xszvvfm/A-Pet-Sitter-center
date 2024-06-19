@@ -3,8 +3,9 @@ import { HTTP_STATUS } from '../constants/http-status.constant.js';
 import { ACCESS_TOKEN_SECRET } from '../constants/env.constants.js';
 import { MESSAGES } from '../constants/message.constant.js';
 import { UsersRepository } from '../repositories/users.repository.js';
+import { prisma } from '../utils/prisma.utils.js';
 
-const usersRepository = new UsersRepository();
+const usersRepository = new UsersRepository(prisma);
 export const requireAccessToken = async (req, res, next) => {
   try {
     const authorization = req.headers.authorization;
