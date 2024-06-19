@@ -1,3 +1,4 @@
+// src/services/review.service.js
 import { HttpError } from '../errors/http.error.js';
 
 export class ReviewService {
@@ -5,27 +6,27 @@ export class ReviewService {
     this.reviewRepository = reviewRepository;
   }
 
-  createReview = async (userId, sitterId, comment, rating, reservationId) => {
-    if (!comment || !rating || !reservationId) {
-      throw new HttpError.BadRequest();
+  createReview = async (userId, sitterId, comment, rating, reserveId) => {
+    if (!comment || !rating || !reserveId) {
+      throw new HttpError.BadRequest('comment, rating, reserveId는 필수 입력사항입니다.');
     }
 
-    const reservation = await this.reviewRepository.getReservationById(reservationId);
+    const reservation = await this.reviewRepository.getReservationById(reserveId);
 
     if (!reservation) {
-      throw new HttpError.NotFound();
+      throw new HttpError.NotFound('해당 예약을 찾을 수 없습니다.');
     }
 
     if (reservation.userId !== userId || reservation.sitterId !== parseInt(sitterId, 10)) {
-      throw new HttpError.Forbidden();
+      throw new HttpError.Forbidden('해당 예약에 대한 리뷰를 작성할 권한이 없습니다.');
     }
 
     const date = new Date(reservation.date.toISOString().split('T')[0]);
 
-    const existingReview = await this.reviewRepository.findExistingReview(userId, sitterId, date);
+    const existingReview = await this.reviewRepository.findExistingReview(userId, parseInt(sitterId, 10), date);
 
     if (existingReview) {
-      throw new HttpError.Conflict();
+      throw new HttpError.Conflict('이미 리뷰를 작성하였습니다.');
     }
 
     const review = await this.reviewRepository.createReview({
@@ -36,7 +37,7 @@ export class ReviewService {
       updatedAt: new Date(),
       petSitter: { connect: { id: parseInt(sitterId, 10) } },
       user: { connect: { id: userId } },
-      reservation: { connect: { id: parseInt(reservationId, 10) } },
+      reservation: { connect: { id: parseInt(reserveId, 10) } },
     });
 
     return {
@@ -61,7 +62,7 @@ export class ReviewService {
     const reviews = await this.reviewRepository.getReviewsByUserId(userId);
 
     if (reviews.length === 0) {
-      throw new HttpError.NotFound();
+      throw new HttpError.NotFound('리뷰를 찾을 수 없습니다.');
     }
 
     const formattedReviews = reviews.map(review => ({
@@ -86,7 +87,7 @@ export class ReviewService {
   };
 
   getSitterReviews = async (sitterId) => {
-    const reviews = await this.reviewRepository.getReviewsBySitterId(sitterId);
+    const reviews = await this.reviewRepository.getReviewsBySitterId(parseInt(sitterId, 10));
 
     if (reviews.length === 0) {
       return {
@@ -118,17 +119,17 @@ export class ReviewService {
 
   updateReview = async (userId, sitterId, reviewId, re_comment, re_rating) => {
     if (!re_comment && !re_rating) {
-      throw new HttpError.BadRequest();
+      throw new HttpError.BadRequest('re_comment 또는 re_rating 중 하나는 필수 입력사항입니다.');
     }
 
-    const review = await this.reviewRepository.getReviewById(reviewId);
+    const review = await this.reviewRepository.getReviewById(parseInt(reviewId, 10));
 
     if (!review) {
-      throw new HttpError.NotFound();
+      throw new HttpError.NotFound('리뷰를 찾을 수 없습니다.');
     }
 
     if (review.sitterId !== parseInt(sitterId, 10) || review.userId !== userId) {
-      throw new HttpError.Forbidden();
+      throw new HttpError.Forbidden('본인의 리뷰만 수정할 수 있습니다.');
     }
 
     const data = {};
@@ -136,7 +137,7 @@ export class ReviewService {
     if (re_rating) data.rating = parseInt(re_rating, 10);
     data.updatedAt = new Date();
 
-    const updatedReview = await this.reviewRepository.updateReview(reviewId, data);
+    const updatedReview = await this.reviewRepository.updateReview(parseInt(reviewId, 10), data);
 
     return {
       status: 200,
@@ -156,21 +157,21 @@ export class ReviewService {
   };
 
   deleteReview = async (userId, sitterId, reviewId) => {
-    const review = await this.reviewRepository.getReviewById(reviewId);
+    const review = await this.reviewRepository.getReviewById(parseInt(reviewId, 10));
 
     if (!review) {
-      throw new HttpError.NotFound();
+      throw new HttpError.NotFound('리뷰를 찾을 수 없습니다.');
     }
 
     if (review.sitterId !== parseInt(sitterId, 10)) {
-      throw new HttpError.NotFound();
+      throw new HttpError.NotFound('해당 펫시터의 리뷰가 없습니다.');
     }
 
     if (review.userId !== userId) {
-      throw new HttpError.Forbidden();
+      throw new HttpError.Forbidden('본인의 리뷰만 삭제할 수 있습니다.');
     }
 
-    await this.reviewRepository.deleteReview(reviewId);
+    await this.reviewRepository.deleteReview(parseInt(reviewId, 10));
 
     return { status: 200, data: { message: '리뷰가 삭제되었습니다.' } };
   };

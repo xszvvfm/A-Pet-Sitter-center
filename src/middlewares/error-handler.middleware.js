@@ -11,6 +11,14 @@ export const errorHandler = (err, req, res, next) => {
     });
   }
 
+  // HttpError에서 발생한 에러 처리
+if (err.status && err.message) {
+  return res.status(err.status).json({
+    status: err.status,
+    message: err.message,
+  });
+}
+
   //http error 처리
   if (err.status && err.message) {
     return res.status(err.status);
