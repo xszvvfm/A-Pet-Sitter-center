@@ -27,6 +27,32 @@ export class ReservationsService {
     return data;
   };
 
+  /** 예약 수정 API **/
+  updateReservation = async (id, sitterId, date, service) => {
+    const existReservation = await this.reservationsRepository.findById(id);
+    //있는 예약인지 확인하기 : service
+
+    ///////
+    if (!existReservation) {
+      //아래에 넣을 내용 HttpError.
+      throw new HttpError.Conflict(
+        MESSAGES.RESERVATION.READ.IS_NOT_RESERVATION,
+      );
+    }
+
+    //   const parseDate = this.parseDate
+    //날짜파싱하는 함수.......ㅠㅠㅠㅠ
+    // update
+    const updatedReservation =
+      await this.reservationsRepository.updateReservation(
+        parseInt(id),
+        parseInt(sitterId),
+        new Date(date),
+        service,
+      );
+    return updatedReservation;
+  };
+
   /** 예약 삭제 API **/
   delete = async (userId, reserveId) => {
     const existedReservation = await reservationsRepository.delete();
