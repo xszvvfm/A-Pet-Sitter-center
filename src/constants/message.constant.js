@@ -33,7 +33,8 @@ export const MESSAGES = {
     },
     PASSWORD:{
       REQUIRED: '비밀번호를 입력해 주세요',
-      MIN_LENGTH: `비밀번호는 ${authConstant.MIN_PASSWORD_LENGTH}자리 이상이어야 합니다.`
+      MIN_LENGTH: `비밀번호는 ${authConstant.MIN_PASSWORD_LENGTH}자리 이상이어야 합니다.`,
+      NOT_MACHTED: '비밀번호를 확인해주세요.'
     },
     PASSWORD_CONFIRM: {
       REQUIRED: '비밀번호 확인을 입력해 주세요',
