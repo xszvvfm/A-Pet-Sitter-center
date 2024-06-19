@@ -1,5 +1,7 @@
 import { HttpError } from '../errors/http.error.js';
+import { HTTP_STATUS } from '../constants/http-status.constant.js';
 import { MESSAGES } from '../constants/message.constant.js';
+import { prisma } from '../utils/prisma.utils.js';
 
 export class ReservationsService {
   constructor(reservationsRepository) {
@@ -8,22 +10,29 @@ export class ReservationsService {
 
   /** 예약 생성 API **/
   create = async (sitterId, userId, date, service) => {
-    const data = await this.reservationsRepository.create({
+    // PetSitter가 존재하는지 확인
+    const petSitter =
+      await this.reservationsRepository.findBySitterId(sitterId);
+
+    if (!petSitter) {
+      throw new HttpError.BadRequest(
+        MESSAGES.RESERVATIONS.COMMON.SITTER_ID.INVALID,
+      );
+    }
+
+    const data = await this.reservationsRepository.create(
       sitterId,
       userId,
       date,
       service,
-    });
+    );
 
     return data;
   };
 
   /** 예약 목록 조회 API **/
   readMany = async (userId, sort) => {
-    const data = await this.reservationsRepository.readMany({
-      userId,
-      sort,
-    });
+    const data = await this.reservationsRepository.readMany(userId, sort);
 
     return data;
   };
@@ -68,17 +77,15 @@ export class ReservationsService {
   };
 
   /** 예약 삭제 API **/
-  delete = async (userId, reserveId) => {
-    const existedReservation = await this.reservationsRepository.delete();
+  delete = async (userId, id) => {
+    const existedReservation =
+      await this.reservationsRepository.reservationReadOne(userId, id);
 
     if (!existedReservation) {
       throw new HttpError.NotFound(MESSAGES.RESERVATIONS.COMMON.NOT_FOUND);
     }
 
-    const data = await this.reservationsRepository.delete({
-      userId,
-      reserveId,
-    });
+    const data = await this.reservationsRepository.delete(userId, id);
 
     return data;
   };

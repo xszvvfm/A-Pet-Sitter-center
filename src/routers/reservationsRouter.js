@@ -2,8 +2,9 @@ import express from 'express';
 import { HTTP_STATUS } from '../constants/http-status.constant.js';
 import { MESSAGES } from '../constants/message.constant.js';
 import { prisma } from '../utils/prisma.utils.js';
+import { createReservationValidator } from '../middlewares/validators/create-reservation-validator.middleware.js';
 import { updateReservationValidator } from '../middlewares/validators/update.reservation.validators.middleware.js';
-import { requireAccessToken } from '../middlewares/require-access-token.middleware.js';
+// import { requireAccessToken } from '../middlewares/require-access-token.middleware.js';
 import { ReservationsController } from '../controllers/reservations.controller.js';
 import { ReservationsService } from '../services/reservations.service.js';
 import { ReservationsRepository } from '../repositories/reservations.repository.js';
@@ -15,7 +16,11 @@ const reservationsService = new ReservationsService(reservationsRepository);
 const reservationsController = new ReservationsController(reservationsService);
 
 /** 예약 생성 API **/
-reservationsRouter.post('/', requireAccessToken, reservationsController.create);
+reservationsRouter.post(
+  '/',
+  createReservationValidator,
+  reservationsController.create,
+);
 
 /** 예약 목록 조회 API **/
 reservationsRouter.get('/', reservationsController.readMany);
@@ -61,7 +66,7 @@ reservationsRouter.get(
 
       return res.status(HTTP_STATUS.OK).json({
         status: HTTP_STATUS.OK,
-        message: MESSAGES.RESERVATION.READ.SUCCEED,
+        message: MESSAGES.RESERVATIONS.READ.SUCCEED,
         data,
       });
     } catch (error) {
@@ -156,6 +161,6 @@ reservationsRouter.patch(
 //------//
 
 /** 예약 삭제 API **/
-reservationsRouter.delete('/:reserveId', reservationsController.delete);
+reservationsRouter.delete('/:id', reservationsController.delete);
 
 export { reservationsRouter };
