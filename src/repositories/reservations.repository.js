@@ -4,30 +4,6 @@ export class ReservationsRepository {
   constructor(prisma) {
     this.prisma = prisma;
   }
-
-  reservationReadOne = async (id) => {
-    let data = await this.prisma.reservation.findFirst({
-      where: { id },
-    });
-    data = {
-      user_id: data.userId,
-      sitter_id: data.sitterId,
-      reserve_id: data.reserveId,
-      date: data.date,
-      service_type: data.service_type,
-      created_at: data.createdAt,
-      updated_at: data.updatedAt,
-    };
-    return data;
-  };
-
-  // user_id,
-  // sitter_id,
-  // reserve_id,
-  // date,
-  // service_type,
-  // created_at,
-  // updated_at,
   /** 예약 생성 API **/
   create = async (sitterId, userId, date, service) => {
     const data = await this.prisma.reservation.create({
@@ -68,6 +44,25 @@ export class ReservationsRepository {
     return data;
   };
 
+  //상세조회
+  reservationReadOne = async (userId, id) => {
+    let data = await this.prisma.reservation.findFirst({
+      where: { userId: +userId, id: +id },
+    });
+    data = {
+      userId: data.userId,
+      sitterId: data.sitterId,
+      reserveId: data.reserveId,
+      date: data.date,
+      serviceType: data.service,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    };
+
+    return data;
+  };
+
+  //수정
   findById = async (id) => {
     const existReservation = await this.prisma.reservation.findFirst({
       where: {
@@ -75,6 +70,14 @@ export class ReservationsRepository {
       },
     });
     return existReservation;
+  };
+
+  findBySitterId = async (sitterId) => {
+    console.log(sitterId);
+    const existSitter = await this.prisma.petSitter.findUnique({
+      where: { id: +sitterId },
+    });
+    return existSitter;
   };
 
   // };
@@ -94,13 +97,13 @@ export class ReservationsRepository {
   };
 
   /** 예약 삭제 API **/
-  delete = async (userId, reserveId) => {
+  delete = async (userId, id) => {
     // const existedReservation = await prisma.reservation.findUnique({
     //   where: { userId: +userId, id: +reserveId },
     // });
 
     const data = await this.prisma.reservation.delete({
-      where: { userId: +userId, id: +reserveId },
+      where: { userId: +userId, id: +id },
     });
 
     return data;
