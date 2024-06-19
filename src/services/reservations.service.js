@@ -1,67 +1,91 @@
-import { ReservationsRepository } from '../repositories/reservations.repository.js';
-import { MESSAGES } from '../constants/message.constant.js';
 import { HttpError } from '../errors/http.error.js';
-
-const reservationsRepository = new ReservationsRepository();
+import { HTTP_STATUS } from '../constants/http-status.constant.js';
+import { MESSAGES } from '../constants/message.constant.js';
+import { prisma } from '../utils/prisma.utils.js';
 
 export class ReservationsService {
+  constructor(reservationsRepository) {
+    this.reservationsRepository = reservationsRepository;
+  }
+
   /** 예약 생성 API **/
   create = async (sitterId, userId, date, service) => {
-    const data = await reservationsRepository.create({
+    // PetSitter가 존재하는지 확인
+    const petSitter =
+      await this.reservationsRepository.findBySitterId(sitterId);
+
+    if (!petSitter) {
+      throw new HttpError.BadRequest(
+        MESSAGES.RESERVATIONS.COMMON.SITTER_ID.INVALID,
+      );
+    }
+
+    const data = await this.reservationsRepository.create(
       sitterId,
       userId,
       date,
       service,
-    });
+    );
 
     return data;
   };
 
   /** 예약 목록 조회 API **/
   readMany = async (userId, sort) => {
-    const data = await reservationsRepository.readMany({
-      userId,
-      sort,
-    });
+    const data = await this.reservationsRepository.readMany(userId, sort);
 
     return data;
   };
 
-  // /** 예약 수정 API **/
-  // updateReservation = async (id, sitterId, date, service) => {
-  //   const existReservation = await this.reservationsRepository.findById(id);
-  //   //있는 예약인지 확인하기 : service
+  //예약 상세조회//
+  reservationReadOne = async (id) => {
+    let data = await this.reservationsRepository.reservationReadOne({
+      where: id,
+    });
+    if (!data) {
+      throw new HttpError.NotFound(
+        MESSAGES.RESERVATION.READ.IS_NOT_RESERVATION,
+      );
+    }
 
-  //   ///////
-  //   if (!existReservation) {
-  //     //아래에 넣을 내용 HttpError.
-  //     throw new HttpError.Conflict(
-  //       MESSAGES.RESERVATION.READ.IS_NOT_RESERVATION,
-  //     );
-  //   }
+    return data;
+  };
 
-  //   //   const parseDate = this.parseDate
-  //   //날짜파싱하는 함수.......ㅠㅠㅠㅠ
-  //   // update
-  //   const updatedReservation =
-  //     await this.reservationsRepository.updateReservation(
-  //       parseInt(id),
-  //       parseInt(sitterId),
-  //       new Date(date),
-  //       service,
-  //     );
-  //   return updatedReservation;
-  // };
+  updateReservation = async (id, sitterId, date, service) => {
+    const existReservation = await this.reservationsRepository.findById(id);
+    //있는 예약인지 확인하기 : service
+
+    ///////
+    if (!existReservation) {
+      //아래에 넣을 내용 HttpError.
+      throw new HttpError.Conflict(
+        MESSAGES.RESERVATION.READ.IS_NOT_RESERVATION,
+      );
+    }
+
+    //   const parseDate = this.parseDate
+    //날짜파싱하는 함수.......ㅠㅠㅠㅠ
+    // update
+    const updatedReservation =
+      await this.reservationsRepository.updateReservation(
+        parseInt(id),
+        parseInt(sitterId),
+        new Date(date),
+        service,
+      );
+    return updatedReservation;
+  };
 
   /** 예약 삭제 API **/
-  delete = async (userId, reserveId) => {
-    const existedReservation = await reservationsRepository.delete();
+  delete = async (userId, id) => {
+    const existedReservation =
+      await this.reservationsRepository.reservationReadOne(userId, id);
 
     if (!existedReservation) {
       throw new HttpError.NotFound(MESSAGES.RESERVATIONS.COMMON.NOT_FOUND);
     }
 
-    const data = await reservationsRepository.delete({ userId, reserveId });
+    const data = await this.reservationsRepository.delete(userId, id);
 
     return data;
   };
