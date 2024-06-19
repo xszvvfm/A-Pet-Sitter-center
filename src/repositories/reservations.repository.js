@@ -41,15 +41,27 @@ export class ReservationsRepository {
     return data;
   };
 
-  findById = async (id) => {
-    const existReservation = await prisma.reservation.findFirst({
-      where: {
-        id,
-      },
-    });
-    return existReservation;
-  };
+  // findById = async (id) => {
+  //   const existReservation = await prisma.reservation.findFirst({
+  //     where: {
+  //       id,
+  //     },
+  //   });
+  //   return existReservation;
+  // };
 
+  // updateReservation = async (id, sitterId, date, service) => {
+  //   const updatedReservation = await prisma.reservation.update({
+  //     where: {
+  //       id,
+  //     },
+  //     data: {
+  //       ...(sitterId && { sitterId }),
+  //       ...(date && { date }),
+  //       ...(service && { service }),
+  //     },
+  //   });
+  //   return updatedReservation;
   // };
   // gogo = async (id, sitterId, date, service) => {
   updateReservation = async (id, sitterId, date, service) => {
