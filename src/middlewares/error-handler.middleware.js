@@ -18,6 +18,11 @@ export const errorHandler = (err, req, res, next) => {
     });
   }
 
+  //http error 처리
+  if (err.status && err.message) {
+    return res.status(err.status);
+  }
+
   // 그 밖의 예상치 못한 에러 처리
   return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
     status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
