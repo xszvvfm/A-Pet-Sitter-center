@@ -20,7 +20,7 @@ reservationsRouter.post('/', requireAccessToken, reservationsController.create);
 /** 예약 목록 조회 API **/
 reservationsRouter.get('/', reservationsController.readMany);
 
-//------//
+//-----//
 //예약 상세조회 : 미들웨어 만들기
 reservationsRouter.get(
   '/:id',
