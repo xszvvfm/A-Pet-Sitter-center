@@ -8,12 +8,11 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/api', apiRouter);
 
 app.get('/health-check', (req, res) => {
   return res.status(HTTP_STATUS.OK).send(`I'm healthy.`);
 });
-
-app.use('/api', apiRouter);
 
 app.use(errorHandler);
 
