@@ -4,19 +4,19 @@ import { requireRefreshToken } from '../middlewares/require-refresh-token.middle
 import { UsersRepository } from '../repositories/users.repository.js';
 import { AuthController } from '../controllers/auth.controller.js';
 import { AuthService } from '../services/auth.service.js';
-//import { signInValidator } from '../middlewares/validators/sign-in-validator.middleware.js';
-//import { signUpValidator } from '../middlewares/validators/sign-up-validator.middleware.js';
+import { signInValidator } from '../middlewares/validators/sign-in-validator.middleware.js';
+import { signUpValidator } from '../middlewares/validators/sign-up-validator.middleware.js';
 const authRouter = express.Router();
 
 const usersRepository = new UsersRepository(prisma);
-const authService = new AuthService(usersRepository)
+const authService = new AuthService(usersRepository);
 const authController = new AuthController(authService);
 
 //회원가입
-authRouter.post('/sign-up', authController.SignUp)
+authRouter.post('/sign-up', signUpValidator, authController.SignUp);
 
 //로그인
-authRouter.post('/sign-in', authController.SignIn);
+authRouter.post('/sign-in', signInValidator, authController.SignIn);
 // 토큰 재발급
 authRouter.post('/token', requireRefreshToken, authController.Token);
 
