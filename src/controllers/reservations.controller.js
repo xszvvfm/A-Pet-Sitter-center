@@ -1,7 +1,7 @@
-import { ReservationsService } from '../services/reservations.service.js';
+// import { ReservationsService } from '../services/reservations.service.js';
 import { HTTP_STATUS } from '../constants/http-status.constant.js';
 import { MESSAGES } from '../constants/message.constant.js';
-import { prisma } from '../utils/prisma.utils.js';
+// import { prisma } from '../utils/prisma.utils.js';
 
 export class ReservationsController {
   constructor(reservationsService) {
@@ -24,7 +24,7 @@ export class ReservationsController {
       }
 
       // PetSitter가 존재하는지 확인 : 레파지토리
-      const petSitter = await prisma.petSitter.findUnique({
+      const petSitter = await this.prisma.petSitter.findUnique({
         where: { id: +sitterId },
       });
 
@@ -87,40 +87,26 @@ export class ReservationsController {
     }
   };
 
+  //상세조회
+
   reservationReadOne = async (req, res, next) => {
     try {
       const { id } = req.params;
 
-      const data = await this.reservationsService.reservationReadOne({ id });
+      const data = await this.reservationsService.reservationReadOne(id);
 
       return res.status(HTTP_STATUS.OK).json({
         status: HTTP_STATUS.OK,
-        message: MESSAGES.RESERVATION.READ.SUCCEED,
+        message: MESSAGES.RESERVATIONS.READ.SUCCEED,
         data,
       });
     } catch (error) {
-      next();
+      next(error);
     }
   };
 
   //예약수정///
   //상세조회
-  getReservationById = async (req, res, next) => {
-    try {
-      const { id } = req.params;
-
-      const oneReservation =
-        await this.reservationsService.findReservationById(id);
-
-      return res.status(HTTP_STATUS.OK).json({
-        status: HTTP_STATUS.OK,
-        message: MESSAGES.RESERVATION.READ.SUCCEED,
-        oneReservation,
-      });
-    } catch (error) {
-      next();
-    }
-  };
 
   //
   updateReservation = async (req, res, next) => {
@@ -148,7 +134,7 @@ export class ReservationsController {
 
       return res.status(HTTP_STATUS.OK).json({
         status: HTTP_STATUS.OK,
-        message: MESSAGES.RESERVATION.UPDATE.SUCCEED,
+        message: MESSAGES.RESERVATIONS.UPDATE.SUCCEED,
         updatedReservation,
       });
     } catch (error) {

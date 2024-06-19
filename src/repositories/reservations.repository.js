@@ -5,22 +5,6 @@ export class ReservationsRepository {
     this.prisma = prisma;
   }
 
-  reservationReadOne = async (id) => {
-    let data = await this.prisma.reservation.findFirst({
-      where: { id },
-    });
-    data = {
-      user_id: data.userId,
-      sitter_id: data.sitterId,
-      reserve_id: data.reserveId,
-      date: data.date,
-      service_type: data.service_type,
-      created_at: data.createdAt,
-      updated_at: data.updatedAt,
-    };
-    return data;
-  };
-
   // user_id,
   // sitter_id,
   // reserve_id,
@@ -68,6 +52,24 @@ export class ReservationsRepository {
     return data;
   };
 
+  //상세조회
+  reservationReadOne = async (id) => {
+    let data = await this.prisma.reservation.findFirst({
+      where: { id: +id },
+    });
+    data = {
+      user_id: data.userId,
+      sitter_id: data.sitterId,
+      reserve_id: data.reserveId,
+      date: data.date,
+      service_type: data.service_type,
+      created_at: data.createdAt,
+      updated_at: data.updatedAt,
+    };
+    return data;
+  };
+
+  //수정
   findById = async (id) => {
     const existReservation = await this.prisma.reservation.findFirst({
       where: {

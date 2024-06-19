@@ -1,5 +1,5 @@
-import { HttpError } from '../errors/httperror.js';
-import { MESSAGES } from '../constants/messages.const.js';
+import { HttpError } from '../errors/http.error.js';
+import { MESSAGES } from '../constants/message.constant.js';
 
 export class ReservationsService {
   constructor(reservationsRepository) {
@@ -30,12 +30,10 @@ export class ReservationsService {
 
   //예약 상세조회//
   reservationReadOne = async (id) => {
-    let data = await this.reservationsRepository.reservationReadOne({
-      where: id,
-    });
+    let data = await this.reservationsRepository.reservationReadOne(id);
     if (!data) {
       throw new HttpError.NotFound(
-        MESSAGES.RESERVATION.READ.IS_NOT_RESERVATION,
+        MESSAGES.RESERVATIONS.READ.IS_NOT_RESERVATION,
       );
     }
 
@@ -47,11 +45,9 @@ export class ReservationsService {
     //있는 예약인지 확인하기 : service
 
     ///////
-    if (!existReservation) {
+    if (existReservation) {
       //아래에 넣을 내용 HttpError.
-      throw new HttpError.Conflict(
-        MESSAGES.RESERVATION.READ.IS_NOT_RESERVATION,
-      );
+      throw new HttpError.Conflict(MESSAGES.RESERVATIONS.UPDATE.IS_RESERVATION);
     }
 
     //   const parseDate = this.parseDate
@@ -64,6 +60,8 @@ export class ReservationsService {
         new Date(date),
         service,
       );
+
+    console.log(updatedReservation);
     return updatedReservation;
   };
 
