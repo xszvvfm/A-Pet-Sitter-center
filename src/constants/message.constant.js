@@ -27,6 +27,7 @@ export const MESSAGES = {
     },
     UPDATE: {
       SUCCEED: '예약수정이 완료되었습니다.',
+      IS_RESERVATION: '이미 있는 예약입니다. 다른 날을 선택해주세요.',
     },
     DELETE: {
       SUCCEED: '예약 삭제에 성공했습니다.',

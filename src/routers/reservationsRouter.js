@@ -15,60 +15,20 @@ const reservationsService = new ReservationsService(reservationsRepository);
 const reservationsController = new ReservationsController(reservationsService);
 
 /** 예약 생성 API **/
-reservationsRouter.post('/', requireAccessToken, reservationsController.create);
+reservationsRouter.post(
+  '/',
+  // requireAccessToken,
+  reservationsController.create,
+);
 
 /** 예약 목록 조회 API **/
 reservationsRouter.get('/', reservationsController.readMany);
-
+// reservationsRouter.get('/:id', (req, res, next) => {
+//   return res.json({ data: 'hello' });
+// });
 //------//
 //예약 상세조회 : 미들웨어 만들기
-reservationsRouter.get(
-  '/:id',
-  reservationsController.getReservationById,
-  // requireAccessToken,
-  async (req, res, next) => {
-    const { id } = req.params;
-    try {
-      let data = await prisma.reservation.findFirst({
-        where: {
-          id: +id,
-        },
-      });
-      if (!data) {
-        return res.status(HTTP_STATUS.NOT_FOUND).json({
-          status: HTTP_STATUS.NOT_FOUND,
-          message: MESSAGES.RESERVATION.READ.IS_NOT_RESERVATION,
-        });
-      }
-
-      data = {
-        user_id: data.userId,
-        sitter_id: data.sitterId,
-        reserve_id: data.reserveId,
-        date: data.date,
-        service_type: data.service_type,
-        created_at: data.createdAt,
-        updated_at: data.updatedAt,
-
-        // user_id,
-        // sitter_id,
-        // reserve_id,
-        // date,
-        // service_type,
-        // created_at,
-        // updated_at,
-      };
-
-      return res.status(HTTP_STATUS.OK).json({
-        status: HTTP_STATUS.OK,
-        message: MESSAGES.RESERVATION.READ.SUCCEED,
-        data,
-      });
-    } catch (error) {
-      next();
-    }
-  },
-);
+reservationsRouter.get('/:id', reservationsController.reservationReadOne);
 //------//
 
 //예약수정 url 라우터 연결 어떻게 할건지
