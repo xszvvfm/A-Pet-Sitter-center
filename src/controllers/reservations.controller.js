@@ -1,11 +1,32 @@
 import { HTTP_STATUS } from '../constants/http-status.constant.js';
 import { MESSAGES } from '../constants/messages.const.js';
-import { ReservationsService } from '../services/reservations.services.js';
+// import { ReservationsService } from '../services/reservations.services.js';
 // import { prisma } from '@prisma/client';
 
 export class ReservationsController {
-  reservationsService = new ReservationsService();
+  // reservationsService = new ReservationsService();
 
+  constructor(reservationsService) {
+    this.reservationsService = reservationsService;
+  }
+
+  reservationReadOne = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+
+      const data = await this.reservationsService.reservationReadOne({ id });
+
+      return res.status(HTTP_STATUS.OK).json({
+        status: HTTP_STATUS.OK,
+        message: MESSAGES.RESERVATION.READ.SUCCEED,
+        data,
+      });
+    } catch (error) {
+      next();
+    }
+  };
+
+  //예약수정///
   //상세조회
   getReservationById = async (req, res, next) => {
     try {

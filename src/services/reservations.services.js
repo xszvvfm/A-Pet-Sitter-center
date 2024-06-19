@@ -1,9 +1,24 @@
-import { ReservationsRepository } from '../repositories/reservations.repository.js';
 import { HttpError } from '../errors/httperror.js';
 import { MESSAGES } from '../constants/messages.const.js';
 
 export class ReservationsService {
-  reservationsRepository = new ReservationsRepository();
+  constructor(reservationsRepository) {
+    this.reservationsRepository = reservationsRepository;
+  }
+
+  //예약 상세조회//
+  reservationReadOne = async (id) => {
+    let data = await this.reservationsRepository.reservationReadOne({
+      where: id,
+    });
+    if (!data) {
+      throw new HttpError.NotFound(
+        MESSAGES.RESERVATION.READ.IS_NOT_RESERVATION,
+      );
+    }
+
+    return data;
+  };
 
   updateReservation = async (id, sitterId, date, service) => {
     const existReservation = await this.reservationsRepository.findById(id);
