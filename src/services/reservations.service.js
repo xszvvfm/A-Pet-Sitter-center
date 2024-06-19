@@ -6,6 +6,28 @@ export class ReservationsService {
     this.reservationsRepository = reservationsRepository;
   }
 
+  /** 예약 생성 API **/
+  create = async (sitterId, userId, date, service) => {
+    const data = await this.reservationsRepository.create({
+      sitterId,
+      userId,
+      date,
+      service,
+    });
+
+    return data;
+  };
+
+  /** 예약 목록 조회 API **/
+  readMany = async (userId, sort) => {
+    const data = await this.reservationsRepository.readMany({
+      userId,
+      sort,
+    });
+
+    return data;
+  };
+
   //예약 상세조회//
   reservationReadOne = async (id) => {
     let data = await this.reservationsRepository.reservationReadOne({
@@ -43,5 +65,21 @@ export class ReservationsService {
         service,
       );
     return updatedReservation;
+  };
+
+  /** 예약 삭제 API **/
+  delete = async (userId, reserveId) => {
+    const existedReservation = await this.reservationsRepository.delete();
+
+    if (!existedReservation) {
+      throw new HttpError.NotFound(MESSAGES.RESERVATIONS.COMMON.NOT_FOUND);
+    }
+
+    const data = await this.reservationsRepository.delete({
+      userId,
+      reserveId,
+    });
+
+    return data;
   };
 }
