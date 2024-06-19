@@ -32,6 +32,7 @@ model PetSitter {
   name         String
   experience   Int
   region       String
+  profileImage String?
   reservations Reservation[]
   reviews      Review[]
 
