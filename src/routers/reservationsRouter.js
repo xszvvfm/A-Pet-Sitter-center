@@ -1,6 +1,6 @@
 import express from 'express';
 import { HTTP_STATUS } from '../constants/http-status.constant.js';
-import { MESSAGES } from '../constants/messages.const.js';
+import { MESSAGES } from '../constants/message.constant.js';
 import { prisma } from '../utils/prisma.utils.js';
 import { updateReservationValidator } from '../middlewares/validators/update.reservation.validators.middleware.js';
 import { requireAccessToken } from '../middlewares/require-access-token.middleware.js';
@@ -32,7 +32,7 @@ reservationsRouter.get(
       if (!data) {
         return res.status(HTTP_STATUS.NOT_FOUND).json({
           status: HTTP_STATUS.NOT_FOUND,
-          message: MESSAGES.RESERVATION.READ.IS_NOT_RESERVATION,
+          message: MESSAGES.RESERVATIONS.READ.IS_NOT_RESERVATION,
         });
       }
 
@@ -56,7 +56,7 @@ reservationsRouter.get(
 
       return res.status(HTTP_STATUS.OK).json({
         status: HTTP_STATUS.OK,
-        message: MESSAGES.RESERVATION.READ.SUCCEED,
+        message: MESSAGES.RESERVATIONS.READ.SUCCEED,
         data,
       });
     } catch (error) {
@@ -151,6 +151,6 @@ reservationsRouter.patch(
 //------//
 
 /** 예약 삭제 API **/
-reservationsRouter.delete('/:reserveId', reservationsController.delete);
+reservationsRouter.delete('/:id', reservationsController.delete);
 
 export { reservationsRouter };

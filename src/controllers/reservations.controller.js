@@ -76,7 +76,7 @@ export class ReservationsController {
 
       return res.status(HTTP_STATUS.OK).json({
         status: HTTP_STATUS.OK,
-        message: MESSAGES.RESERVATIONS.READ_LIST.SUCCEED,
+        message: MESSAGES.RESERVATIONS.READ.SUCCEED,
         data,
       });
     } catch (error) {
@@ -94,7 +94,7 @@ export class ReservationsController {
 
       return res.status(HTTP_STATUS.OK).json({
         status: HTTP_STATUS.OK,
-        message: MESSAGES.RESERVATION.READ.SUCCEED,
+        message: MESSAGES.RESERVATIONS.READ.SUCCEED,
         oneReservation,
       });
     } catch (error) {
@@ -141,7 +141,7 @@ export class ReservationsController {
     try {
       const user = req.user;
       const userId = user.id;
-      const { reserveId } = req.params;
+      const { id } = req.params;
 
       return res.status(HTTP_STATUS.OK).json({
         status: HTTP_STATUS.OK,
