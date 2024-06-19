@@ -5,10 +5,14 @@ import { prisma } from '../utils/prisma.utils.js';
 import { updateReservationValidator } from '../middlewares/validators/update.reservation.validators.middleware.js';
 import { requireAccessToken } from '../middlewares/require-access-token.middleware.js';
 import { ReservationsController } from '../controllers/reservations.controller.js';
+import { ReservationsService } from '../services/reservations.service.js';
+import { ReservationsRepository } from '../repositories/reservations.repository.js';
 
 const reservationsRouter = express.Router();
 
-const reservationsController = new ReservationsController();
+const reservationsRepository = new ReservationsRepository(prisma);
+const reservationsService = new ReservationsService(reservationsRepository);
+const reservationsController = new ReservationsController(reservationsService);
 
 /** 예약 생성 API **/
 reservationsRouter.post('/', requireAccessToken, reservationsController.create);
@@ -20,6 +24,7 @@ reservationsRouter.get('/', reservationsController.readMany);
 //예약 상세조회 : 미들웨어 만들기
 reservationsRouter.get(
   '/:id',
+  reservationsController.getReservationById,
   // requireAccessToken,
   async (req, res, next) => {
     const { id } = req.params;
