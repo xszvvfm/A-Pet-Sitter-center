@@ -11,7 +11,7 @@ export const errorHandler = (err, req, res, next) => {
     });
   }
   //Http Error 처리
-  if(err.status && err.message) {
+  if (err.status && err.message) {
     return res.status(err.status).json({
       status: err.status,
       message: err.message,
