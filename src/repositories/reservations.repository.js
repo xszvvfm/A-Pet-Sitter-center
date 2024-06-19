@@ -1,9 +1,36 @@
-import { prisma } from '../utils/prisma.utils.js';
+// import { prisma } from '../utils/prisma.utils.js';
 
 export class ReservationsRepository {
+  constructor(prisma) {
+    this.prisma = prisma;
+  }
+
+  reservationReadOne = async (id) => {
+    let data = await this.prisma.reservation.findFirst({
+      where: { id },
+    });
+    data = {
+      user_id: data.userId,
+      sitter_id: data.sitterId,
+      reserve_id: data.reserveId,
+      date: data.date,
+      service_type: data.service_type,
+      created_at: data.createdAt,
+      updated_at: data.updatedAt,
+    };
+    return data;
+  };
+
+  // user_id,
+  // sitter_id,
+  // reserve_id,
+  // date,
+  // service_type,
+  // created_at,
+  // updated_at,
   /** 예약 생성 API **/
   create = async (sitterId, userId, date, service) => {
-    const data = await prisma.reservation.create({
+    const data = await this.prisma.reservation.create({
       data: {
         sitterId: +sitterId,
         userId: +userId,
@@ -17,7 +44,7 @@ export class ReservationsRepository {
 
   /** 예약 목록 조회 API **/
   readMany = async (userId, sort) => {
-    let data = await prisma.reservation.findMany({
+    let data = await this.prisma.reservation.findMany({
       where: {
         userId: +userId,
       },
@@ -42,7 +69,7 @@ export class ReservationsRepository {
   };
 
   findById = async (id) => {
-    const existReservation = await prisma.reservation.findFirst({
+    const existReservation = await this.prisma.reservation.findFirst({
       where: {
         id,
       },
@@ -53,7 +80,7 @@ export class ReservationsRepository {
   // };
   // gogo = async (id, sitterId, date, service) => {
   updateReservation = async (id, sitterId, date, service) => {
-    const updatedReservation = await prisma.reservation.update({
+    const updatedReservation = await this.prisma.reservation.update({
       where: {
         id,
       },
@@ -72,7 +99,7 @@ export class ReservationsRepository {
     //   where: { userId: +userId, id: +reserveId },
     // });
 
-    const data = await prisma.reservation.delete({
+    const data = await this.prisma.reservation.delete({
       where: { userId: +userId, id: +reserveId },
     });
 

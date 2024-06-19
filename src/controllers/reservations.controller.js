@@ -3,9 +3,11 @@ import { HTTP_STATUS } from '../constants/http-status.constant.js';
 import { MESSAGES } from '../constants/message.constant.js';
 import { prisma } from '../utils/prisma.utils.js';
 
-const reservationsService = new ReservationsService();
-
 export class ReservationsController {
+  constructor(reservationsService) {
+    this.reservationsService = reservationsService;
+  }
+
   /** 예약 생성 API **/
   create = async (req, res, next) => {
     try {
@@ -13,7 +15,7 @@ export class ReservationsController {
       const userId = user.id;
       const { sitterId, date, service } = req.body;
 
-      // 필수 입력 필드 검증
+      // 필수 입력 필드 검증 : 바디에 들어왔는지 아닌지 => 디비에서 찾지 않아도 되므로 컨트롤러
       if (!sitterId || !date || !service) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
           status: HTTP_STATUS.BAD_REQUEST,
@@ -21,11 +23,12 @@ export class ReservationsController {
         });
       }
 
-      // PetSitter가 존재하는지 확인
+      // PetSitter가 존재하는지 확인 : 레파지토리
       const petSitter = await prisma.petSitter.findUnique({
         where: { id: +sitterId },
       });
 
+      //서비스
       if (!petSitter) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
           status: HTTP_STATUS.BAD_REQUEST,
@@ -33,7 +36,7 @@ export class ReservationsController {
         });
       }
 
-      const data = await reservationsService.create({
+      const data = await this.reservationsService.create({
         sitterId,
         userId,
         date,
@@ -72,7 +75,7 @@ export class ReservationsController {
         sort = 'desc';
       }
 
-      const data = await reservationsService.readMany({ userId, sort });
+      const data = await this.reservationsService.readMany({ userId, sort });
 
       return res.status(HTTP_STATUS.OK).json({
         status: HTTP_STATUS.OK,
@@ -84,6 +87,23 @@ export class ReservationsController {
     }
   };
 
+  reservationReadOne = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+
+      const data = await this.reservationsService.reservationReadOne({ id });
+
+      return res.status(HTTP_STATUS.OK).json({
+        status: HTTP_STATUS.OK,
+        message: MESSAGES.RESERVATION.READ.SUCCEED,
+        data,
+      });
+    } catch (error) {
+      next();
+    }
+  };
+
+  //예약수정///
   //상세조회
   getReservationById = async (req, res, next) => {
     try {
@@ -146,7 +166,7 @@ export class ReservationsController {
       return res.status(HTTP_STATUS.OK).json({
         status: HTTP_STATUS.OK,
         message: MESSAGES.RESERVATIONS.DELETE.SUCCEED,
-        data: { id: data.id },
+        data: { id: null },
       });
     } catch (error) {
       next(error);
