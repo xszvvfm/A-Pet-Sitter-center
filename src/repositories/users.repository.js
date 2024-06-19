@@ -1,11 +1,13 @@
 import { authConstant } from "../constants/auth.constant.js";
 import bcrypt from 'bcrypt';
-import { prisma } from '../utils/prisma.utils.js'
 
 export class UsersRepository {
+  constructor(prisma) { 
+    this.prisma = prisma;
+  }
     create = async({ email, password, username}) => {
         const hassedPassword = bcrypt.hashSync(password, authConstant.HASH_SALT_ROUNDS);
-          const { _password, ...user } = await prisma.user.create({
+          const { _password, ...user } = await this.prisma.user.create({
             data: {
               email,
               password: hassedPassword,
@@ -17,14 +19,14 @@ export class UsersRepository {
     }
 
     findUserByEmail = async (email) => {
-        const data = await prisma.user.findUnique({
+        const data = await this.prisma.user.findUnique({
             where: { email },
           });
         return data;  
     }
 
     readOneById = async (id) => {
-        const data =  await prisma.user.findUnique({
+        const data =  await this.prisma.user.findUnique({
             where: { id },
          
           });
@@ -32,7 +34,7 @@ export class UsersRepository {
     }
 
     deleteRefreshToken = async(user) => {
-        await prisma.refreshToken.update({
+        await this.prisma.refreshToken.update({
             where: { userId: user.id },
             data: { token: null },
         });
@@ -41,7 +43,7 @@ export class UsersRepository {
 
     upsertRefreshToken = async (userId, refreshToken) => {
         const hashedRefreshToken = bcrypt.hashSync(refreshToken, 10);
-        await prisma.refreshToken.upsert({
+        await this.prisma.refreshToken.upsert({
             where: {
               userId,
             },

@@ -1,5 +1,5 @@
 import { ReservationsRepository } from '../repositories/reservations.repository.js';
-import { HttpError } from '../errors/httperror.js';
+import { HttpError } from '../errors/http.error.js';
 import { MESSAGES } from '../constants/messages.const.js';
 
 export class ReservationsService {

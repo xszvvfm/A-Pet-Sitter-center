@@ -1,27 +1,27 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { HttpError } from "../errors/http.error.js";
+import { HttpError } from '../errors/http.error.js';
 import { MESSAGES } from '../constants/message.constant.js';
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from "../constants/env.constants.js";
-import { UsersRepository } from '../repositories/users.repository.js';
-
-const usersRepository = new UsersRepository();
 
 export class AuthService {
+  constructor(usersRepository) {
+    this.usersRepository = usersRepository;
+  }
     SignUp = async ({email, password, passwordConfirm, username}) => {
-        const existedUser = await usersRepository.findUserByEmail(email);
+        const existedUser = await this.usersRepository.findUserByEmail(email);
           if (existedUser) {
             throw new HttpError.Conflict(MESSAGES.AUTH.COMMON.EMAIL.DUPLICATED)
           }
           if (password !== passwordConfirm) {
             throw new HttpError.Conflict(MESSAGES.AUTH.COMMON.PASSWORD_CONFIRM.NOT_MACHTED_PASSWORD)
           }
-          const data = await usersRepository.create({email,password,username})
+          const data = await this.usersRepository.create({email,password,username})
           return data;
     }
 
     SignIn = async ({email, password}) => {
-        const user = await usersRepository.findUserByEmail(email);
+        const user = await this.usersRepository.findUserByEmail(email);
           if (!user) {
             throw new HttpError.BadRequest(MESSAGES.AUTH.SIGN_IN.NOT_USER);
           }
@@ -43,7 +43,7 @@ export class AuthService {
 
     //로그아웃
     SignOut = async (user) => {
-        const data = await usersRepository.deleteRefreshToken(user)
+        const data = await this.usersRepository.deleteRefreshToken(user)
         return data
     }
 
@@ -56,7 +56,7 @@ export class AuthService {
         const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, {
           expiresIn: '7d',
         });
-        await usersRepository.upsertRefreshToken(userId, refreshToken);
+        await this.usersRepository.upsertRefreshToken(userId, refreshToken);
         return { accessToken, refreshToken };
       };
 }

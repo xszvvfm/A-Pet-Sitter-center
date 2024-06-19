@@ -1,16 +1,16 @@
 import { HTTP_STATUS } from '../constants/http-status.constant.js';
 import { MESSAGES } from '../constants/message.constant.js';
-import { AuthService } from '../services/auth.service.js';
-
-const authService = new AuthService();
 
 export class AuthController {
+  constructor(authService) {
+    this.authService = authService;
+  }
     //회원가입
     SignUp = async (req, res, next) => {
         try {
           const { email, password, passwordConfirm, username } = req.body;
          //service
-         const data = await authService.SignUp({email, password, passwordConfirm, username})   
+         const data = await this.authService.SignUp({email, password, passwordConfirm, username})   
          
          return res.status(HTTP_STATUS.CREATED).json({
             status: HTTP_STATUS.CREATED,
@@ -25,7 +25,7 @@ export class AuthController {
     SignIn = async (req, res, next) => {
         try {
           const { email, password } = req.body;
-          const data = await authService.SignIn({email, password})
+          const data = await this.authService.SignIn({email, password})
           return res
             .status(HTTP_STATUS.OK)
             .json({ status: HTTP_STATUS.OK, message: MESSAGES.AUTH.SIGN_IN.SUCCEED, data });
@@ -37,7 +37,7 @@ export class AuthController {
     Token = async (req, res, next) => {
         try {
           const user = req.user;
-          const data = await authService.Token(user)
+          const data = await this.authService.Token(user)
       
           return res
             .status(HTTP_STATUS.OK)
@@ -54,7 +54,7 @@ export class AuthController {
     SignOut = async (req, res, next) => {
         try {
           const user = req.user;
-          const data = await authService.SignOut(user)
+          const data = await this.authService.SignOut(user)
           return res
             .status(HTTP_STATUS.OK)
             .json({
