@@ -5,7 +5,7 @@ import { prisma } from '../utils/prisma.utils.js';
 import { updateReservationValidator } from '../middlewares/validators/update.reservation.validators.middleware.js';
 import { requireAccessToken } from '../middlewares/require-access-token.middleware.js';
 import { ReservationsController } from '../controllers/reservations.controller.js';
-import { ReservationsService } from '../services/reservations.services.js';
+import { ReservationsService } from '../services/reservations.service.js';
 import { ReservationsRepository } from '../repositories/reservations.repository.js';
 
 const reservationsRouter = express.Router();
