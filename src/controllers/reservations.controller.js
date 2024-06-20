@@ -180,11 +180,9 @@ export class ReservationsController {
   /** 예약 삭제 API **/
   delete = async (req, res, next) => {
     try {
-      const user = req.user;
-      const userId = user.id;
       const { id } = req.params;
 
-      const data = await this.reservationsService.delete(userId, id);
+      const data = await this.reservationsService.delete(id);
 
       return res.status(HTTP_STATUS.OK).json({
         status: HTTP_STATUS.OK,

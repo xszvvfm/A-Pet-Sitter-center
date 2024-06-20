@@ -22,13 +22,18 @@ export class ReservationsService {
 
     // 동일한 펫시터와 날짜로 이미 예약이 있는지 확인
     const existingReservation =
-      await this.reservationsRepository.findReservationBySitterIdAndDate(
-        sitterId,
-        date,
-      );
+      await this.reservationsRepository.findBySitterIdAndDate(sitterId, date);
 
     if (existingReservation) {
       throw new HttpError.BadRequest(MESSAGES.RESERVATIONS.CREATE.DUPLICATE);
+    }
+
+    // 현재 날짜와 예약 날짜 비교
+    const currentDate = new Date();
+    const reservationDate = new Date(date);
+
+    if (currentDate > reservationDate) {
+      throw new HttpError.BadRequest(MESSAGES.RESERVATIONS.CREATE.INVALID_DATE);
     }
 
     const data = await this.reservationsRepository.create(
@@ -86,15 +91,15 @@ export class ReservationsService {
   };
 
   /** 예약 삭제 API **/
-  delete = async (userId, id) => {
-    const existedReservation =
-      await this.reservationsRepository.reservationReadOne(userId, id);
+  delete = async (id) => {
+    // 존재하는 예약인지 확인
+    const existedReservation = await this.reservationsRepository.findById(id);
 
     if (!existedReservation) {
       throw new HttpError.NotFound(MESSAGES.RESERVATIONS.COMMON.NOT_FOUND);
     }
 
-    const data = await this.reservationsRepository.delete(userId, id);
+    const data = await this.reservationsRepository.delete(id);
 
     return data;
   };

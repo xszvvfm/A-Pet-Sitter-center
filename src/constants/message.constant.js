@@ -12,16 +12,18 @@ export const MESSAGES = {
       DATE: {
         REQUIRED: '날짜를 입력해 주세요.',
         DATE_BASE: '날짜는 유효한 날짜여야 합니다.',
+        INVALID_DATE: '유효한 날짜 및 시간 형식이어야 합니다.',
       },
       SERVICE: {
         REQUIRED: '서비스를 입력해 주세요.',
         INVALID_SERVICE_TYPE:
-          'PET_WALKING 이나 PET_CARE, PET_GROOMING 에서 서비스를 골라주세요',
+          'PET_WALKING, PET_CARE, PET_GROOMING 중에서 서비스를 골라주세요',
       },
       NOT_FOUND: '예약이 존재하지 않습니다.',
     },
     CREATE: {
       DUPLICATE: '해당 펫시터는 이미 해당 날짜에 예약되어 있습니다.',
+      INVALID_DATE: '예약 날짜 및 시간은 현재 시간 이후여야 합니다.',
       SUCCEED: '예약 생성에 성공했습니다.',
     },
     READ: {
