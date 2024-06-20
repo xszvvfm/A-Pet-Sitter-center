@@ -37,7 +37,7 @@
   - 리뷰 CRUD
   - 리뷰 좋아요/좋아요 취소
   - AWS S3 구성 및 설정, 배포
-  - multer를 이용한 이미지 업로더
+  - multer를 이용한 펫시터 프로필 이미지 업로더
   - 펫시터 목록조회, 상세조회
 
 ## 📌기술 스택
@@ -84,6 +84,12 @@ yarn
 
 ```sh
 yarn prisma db push
+```
+
+- 펫시터 DB seeding 생성
+
+```sh
+yarn seed
 ```
 
 - 서버 실행 (배포용)

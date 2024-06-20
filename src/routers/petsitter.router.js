@@ -4,7 +4,7 @@ import { PetSitterService } from '../services/petsitter.service.js';
 import { PetSitterRepository } from '../repositories/petsitter.repository.js';
 import { prisma } from '../utils/prisma.utils.js';
 
-import upload from '../../multer-s3.config.js'; // Multer S3 설정 파일 임포트
+import upload from '../multer-s3.config.js'; // Multer S3 설정 파일 임포트
 
 const petsitters = express.Router();
 
