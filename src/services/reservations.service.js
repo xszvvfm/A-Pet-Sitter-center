@@ -73,10 +73,7 @@ export class ReservationsService {
     }
 
     const alreadyReservation =
-      await this.reservationsRepository.findReservationBySitterIdAndDate(
-        sitterId,
-        date,
-      );
+      await this.reservationsRepository.findBySitterIdAndDate(sitterId, date);
 
     //서비스
     //alreadyReservation 이 null 이면 해당 날짜에 예약이 없는 것=> 예약가능하게
