@@ -30,7 +30,7 @@ export class ReviewRepository {
     });
   };
 
-  // 특정 유저의 리뷰 목록을 조회하는 메서드
+  // 특정 유저의 리뷰 목록을 조회하는 메서드(리뷰 상세 조회)
   getReviewsByUserId = async (userId) => {
     return await this.prisma.review.findMany({
       where: { userId }, // 유저 ID로 리뷰 조회
@@ -45,7 +45,7 @@ export class ReviewRepository {
     });
   };
 
-  // 특정 펫시터의 리뷰 목록을 조회하는 메서드
+  // 특정 펫시터의 리뷰 목록을 조회하는 메서드(리뷰 전체 조회)
   getReviewsBySitterId = async (sitterId) => {
     return await this.prisma.review.findMany({
       where: { sitterId }, // 펫시터 ID로 리뷰 조회
