@@ -65,7 +65,7 @@ export class ReservationsService {
     //있는 예약인지 확인하기 : service
 
     ///////
-    if (existReservation) {
+    if (!existReservation) {
       //아래에 넣을 내용 HttpError.
       throw new HttpError.Conflict(MESSAGES.RESERVATIONS.UPDATE.IS_RESERVATION);
     }
