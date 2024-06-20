@@ -23,6 +23,7 @@ model User {
   reservations  Reservation[]
   reviews       Review[]
   refreshTokens RefreshToken?
+  likes         ReviewLike[]
 
   @@map("users")
 }
@@ -68,8 +69,21 @@ model Review {
   reservation   Reservation? @relation(fields: [reservationId], references: [id])
   petSitter     PetSitter    @relation(fields: [sitterId], references: [id])
   user          User         @relation(fields: [userId], references: [id])
+  likedBy       ReviewLike[] // 리뷰에 좋아요를 누른 사용자들
+  likes         Int          @default(0) //좋아요 카운트
 
   @@map("reviews")
+}
+
+model ReviewLike {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  reviewId  Int      @map("review_id")
+  user      User     @relation(fields: [userId], references: [id])
+  review    Review   @relation(fields: [reviewId], references: [id])
+
+  @@unique([userId, reviewId]) // 같은 유저가 같은 리뷰에 중복으로 좋아요를 누르지 못하도록 설정
+  @@map("review_likes")
 }
 
 model RefreshToken {
