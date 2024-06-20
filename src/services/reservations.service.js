@@ -91,15 +91,15 @@ export class ReservationsService {
   };
 
   /** 예약 삭제 API **/
-  delete = async (userId, id) => {
-    const existedReservation =
-      await this.reservationsRepository.reservationReadOne(userId, id);
+  delete = async (id) => {
+    // 존재하는 예약인지 확인
+    const existedReservation = await this.reservationsRepository.findById(id);
 
     if (!existedReservation) {
       throw new HttpError.NotFound(MESSAGES.RESERVATIONS.COMMON.NOT_FOUND);
     }
 
-    const data = await this.reservationsRepository.delete(userId, id);
+    const data = await this.reservationsRepository.delete(id);
 
     return data;
   };

@@ -69,9 +69,9 @@ export class ReservationsRepository {
   };
 
   //상세조회
-  reservationReadOne = async (userId, id) => {
+  reservationReadOne = async (id) => {
     let data = await this.prisma.reservation.findFirst({
-      where: { id: +id, userId: +userId },
+      where: { id: +id },
     });
     data = {
       userId: data.userId,
@@ -89,7 +89,7 @@ export class ReservationsRepository {
   findById = async (id) => {
     const existReservation = await this.prisma.reservation.findFirst({
       where: {
-        id,
+        id: +id,
       },
     });
     return existReservation;
@@ -133,13 +133,9 @@ export class ReservationsRepository {
   };
 
   /** 예약 삭제 API **/
-  delete = async (userId, id) => {
-    // const existedReservation = await prisma.reservation.findUnique({
-    //   where: { userId: +userId, id: +reserveId },
-    // });
-
+  delete = async (id) => {
     const data = await this.prisma.reservation.delete({
-      where: { userId: +userId, id: +id },
+      where: { id: +id },
     });
 
     return data;
