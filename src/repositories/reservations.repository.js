@@ -74,13 +74,13 @@ export class ReservationsRepository {
       where: { userId: +userId, id: +id },
     });
     data = {
-      user_id: data.userId,
-      sitter_id: data.sitterId,
-      reserve_id: data.reserveId,
+      userId: data.userId,
+      sitterId: data.sitterId,
+      reserveId: data.reserveId,
       date: data.date,
-      service_type: data.service_type,
-      created_at: data.createdAt,
-      updated_at: data.updatedAt,
+      serviceType: data.service_type,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
     };
     return data;
   };
