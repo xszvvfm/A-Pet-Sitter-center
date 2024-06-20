@@ -1,5 +1,3 @@
-// import { prisma } from '../utils/prisma.utils.js';
-
 export class ReservationsRepository {
   constructor(prisma) {
     this.prisma = prisma;
@@ -74,7 +72,6 @@ export class ReservationsRepository {
 
   /** 펫시터 조회 API **/
   findBySitterId = async (sitterId) => {
-    console.log(sitterId);
     const existSitter = await this.prisma.petSitter.findUnique({
       where: { id: +sitterId },
     });
@@ -93,8 +90,6 @@ export class ReservationsRepository {
     });
   };
 
-  // };
-  // gogo = async (id, sitterId, date, service) => {
   updateReservation = async (id, sitterId, date, service) => {
     const updatedReservation = await this.prisma.reservation.update({
       where: {
@@ -104,7 +99,6 @@ export class ReservationsRepository {
         ...(sitterId && { sitterId }),
         ...(date && { date }),
         ...(service && { service }),
-        // ...service
       },
     });
     return updatedReservation;

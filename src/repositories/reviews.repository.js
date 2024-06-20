@@ -1,5 +1,3 @@
-// src/repositories/review.repository.js
-
 // ReviewRepository 클래스는 Prisma ORM을 사용하여 리뷰와 관련된 데이터베이스 작업을 수행
 export class ReviewRepository {
   // 생성자 함수에서는 Prisma 인스턴스를 주입

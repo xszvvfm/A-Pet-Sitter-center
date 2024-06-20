@@ -1,5 +1,4 @@
 import Joi from 'joi';
-// import { MESSAGES } from '../../constants/messages.const.js';
 
 const ServiceType = Joi.object({
   PET_WALKING: 'PET_WALKING',
@@ -23,10 +22,3 @@ export const updateReservationValidator = async (req, res, next) => {
     next(error);
   }
 };
-
-// sitter_id: Joi.number()
-//     .required()
-//     .messages({
-//       number: MESSAGES.PESITTER.IS_NOT_NUMBER,
-//       'any.required': MESSAGES.PESITTER.REQUIRED,
-//     }),

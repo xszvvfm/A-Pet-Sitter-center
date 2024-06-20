@@ -1,4 +1,3 @@
-// src/routers/petsitter.router.js
 import express from 'express';
 import { PetSitterController } from '../controllers/petsitter.controller.js';
 import { PetSitterService } from '../services/petsitter.service.js';
@@ -23,6 +22,10 @@ petsitters.get(
 );
 
 //펫시터 이미지 업로드
-petsitters.post('/petsitters/:sitterId/profileimage', upload.single('profileImage'), petSitterController.uploadProfileImage);
+petsitters.post(
+  '/petsitters/:sitterId/profileimage',
+  upload.single('profileImage'),
+  petSitterController.uploadProfileImage,
+);
 
 export { petsitters };

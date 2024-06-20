@@ -1,7 +1,5 @@
 import { HttpError } from '../errors/http.error.js';
-// import { HTTP_STATUS } from '../constants/http-status.constant.js';
 import { MESSAGES } from '../constants/message.constant.js';
-import { prisma } from '../utils/prisma.utils.js';
 
 export class ReservationsService {
   constructor(reservationsRepository) {
@@ -69,7 +67,6 @@ export class ReservationsService {
     const existReservation = await this.reservationsRepository.findById(id);
     //있는 예약인지 확인하기 : service
 
-    ///////
     if (!existReservation) {
       //아래에 넣을 내용 HttpError.
       throw new HttpError.Conflict(MESSAGES.RESERVATIONS.UPDATE.IS_RESERVATION);
@@ -80,7 +77,6 @@ export class ReservationsService {
         sitterId,
         date,
       );
-    console.log('alreadyReservation-->', alreadyReservation);
 
     //서비스
     //alreadyReservation 이 null 이면 해당 날짜에 예약이 없는 것=> 예약가능하게
@@ -91,7 +87,6 @@ export class ReservationsService {
       throw new HttpError.Conflict('이미 예약된 정보입니다.');
     }
 
-    //날짜파싱하는 함수.......ㅠㅠㅠㅠ
     // update
     const updatedReservation =
       await this.reservationsRepository.updateReservation(
@@ -100,10 +95,7 @@ export class ReservationsService {
         new Date(date),
         service,
       );
-    //------------//
 
-    //------------//
-    console.log(updatedReservation);
     return updatedReservation;
   };
 

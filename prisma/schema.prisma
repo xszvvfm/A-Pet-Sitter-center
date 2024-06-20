@@ -65,7 +65,7 @@ model Review {
   comment       String
   createdAt     DateTime     @default(now()) @map("created_at")
   updatedAt     DateTime     @updatedAt @map("updated_at")
-  reservationId Int?          @unique @map("reservation_id")
+  reservationId Int?         @unique @map("reservation_id")
   reservation   Reservation? @relation(fields: [reservationId], references: [id])
   petSitter     PetSitter    @relation(fields: [sitterId], references: [id])
   user          User         @relation(fields: [userId], references: [id])
@@ -76,11 +76,11 @@ model Review {
 }
 
 model ReviewLike {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @map("user_id")
-  reviewId  Int      @map("review_id")
-  user      User     @relation(fields: [userId], references: [id])
-  review    Review   @relation(fields: [reviewId], references: [id])
+  id       Int    @id @default(autoincrement())
+  userId   Int    @map("user_id")
+  reviewId Int    @map("review_id")
+  user     User   @relation(fields: [userId], references: [id])
+  review   Review @relation(fields: [reviewId], references: [id])
 
   @@unique([userId, reviewId]) // 같은 유저가 같은 리뷰에 중복으로 좋아요를 누르지 못하도록 설정
   @@map("review_likes")

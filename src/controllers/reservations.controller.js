@@ -1,8 +1,5 @@
-// import { ReservationsService } from '../services/reservations.service.js';
 import { HTTP_STATUS } from '../constants/http-status.constant.js';
 import { MESSAGES } from '../constants/message.constant.js';
-import { HttpError } from '../errors/http.error.js';
-import { prisma } from '../utils/prisma.utils.js';
 
 export class ReservationsController {
   constructor(reservationsService) {
@@ -15,7 +12,6 @@ export class ReservationsController {
       const user = req.user;
       const userId = user.id;
       const { sitterId, date, service } = req.body;
-      console.log(sitterId);
 
       const data = await this.reservationsService.create(
         sitterId,
@@ -105,7 +101,6 @@ export class ReservationsController {
     }
   };
 
-  //
   updateReservation = async (req, res, next) => {
     //예약수정 : 시터아이디, 날짜, 서비스타입 : 바디로 받아오기
 
@@ -117,27 +112,7 @@ export class ReservationsController {
       const { id } = req.params;
       //수정할 정보
       const { sitterId, date, service } = req.body;
-      //------//
-      //있는 예약인지 확인하기 : service
 
-      //해당 펫시터에게 예약이 있는 날짜인지 확인하기
-      // 펫시터정보를 어디서 가져올지? 펫시터의 예약의-> 날짜
-
-      /////------------------추가부분----------------------////////
-      //레파지토리
-      // const alreadyReservation = await prisma.reservation.findFirst({
-      //   where: { sitterId: +sitterId, date },
-      // });
-      // console.log('alreadyReservation-->', alreadyReservation);
-
-      // //서비스
-      // //alreadyReservation 이 null 이면 해당 날짜에 예약이 없는 것=> 예약가능하게
-      // const isMyReservation =
-      //   userId === alreadyReservation.userId && id === alreadyReservation.id;
-      // //안되는 경우 먼저 거르기
-      // if (alreadyReservation && !isMyReservation) {
-      //   throw new HttpError.Conflict('이미 예약된 정보입니다.');
-      // }
       const updatedReservation =
         await this.reservationsService.updateReservation(
           parseInt(id),
@@ -153,9 +128,6 @@ export class ReservationsController {
         message: MESSAGES.RESERVATIONS.UPDATE.SUCCEED,
         updatedReservation,
       });
-      //--------추가구현부분-----------//
-
-      //-----//가져올 아이디 등 어떻게 가져올지 다시 보기 :
     } catch (error) {
       next(error);
     }
