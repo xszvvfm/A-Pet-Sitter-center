@@ -5,12 +5,11 @@ export class ReviewController {
   }
 
   createReview = async (req, res, next) => {
-    const { sitterId } = req.params;
     const { comment, rating, reserveId } = req.body;
     const userId = req.user.id;
 
     try {
-      const result = await this.reviewService.createReview(userId, parseInt(sitterId, 10), comment, rating, reserveId);
+      const result = await this.reviewService.createReview(userId, comment, rating, reserveId);
       return res.status(result.status).json(result.data || { error: result.message });
     } catch (error) {
       next(error);
@@ -40,12 +39,12 @@ export class ReviewController {
   };
 
   updateReview = async (req, res, next) => {
-    const { sitterId, reviewId } = req.params;
+    const { reviewId } = req.params;
     const { re_comment, re_rating } = req.body;
     const userId = req.user.id;
 
     try {
-      const result = await this.reviewService.updateReview(userId, parseInt(sitterId, 10), parseInt(reviewId, 10), re_comment, re_rating);
+      const result = await this.reviewService.updateReview(userId, parseInt(reviewId, 10), re_comment, re_rating);
       return res.status(result.status).json(result.data || { error: result.message });
     } catch (error) {
       next(error);
@@ -53,11 +52,11 @@ export class ReviewController {
   };
 
   deleteReview = async (req, res, next) => {
-    const { sitterId, reviewId } = req.params;
+    const { reviewId } = req.params;
     const userId = req.user.id;
 
     try {
-      const result = await this.reviewService.deleteReview(userId, parseInt(sitterId, 10), parseInt(reviewId, 10));
+      const result = await this.reviewService.deleteReview(userId, parseInt(reviewId, 10));
       return res.status(result.status).json(result.data || { error: result.message });
     } catch (error) {
       next(error);
