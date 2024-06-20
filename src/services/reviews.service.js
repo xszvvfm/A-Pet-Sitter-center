@@ -55,6 +55,7 @@ export class ReviewService {
         created_at: review.createdAt,
         updated_at: review.updatedAt,
         reservation_id: review.reservationId,
+        likes: review.likes,
       }
     };
   };
@@ -76,6 +77,7 @@ export class ReviewService {
       rating: review.rating,
       created_at: review.createdAt,
       updated_at: review.updatedAt,
+      likes: review.likes,
     }));
 
     return {
@@ -113,6 +115,7 @@ export class ReviewService {
           rating: review.rating,
           created_at: review.createdAt,
           updated_at: review.updatedAt,
+          likes: review.likes,
         })),
       }
     };
@@ -153,6 +156,7 @@ export class ReviewService {
         comment: updatedReview.comment,
         created_at: updatedReview.createdAt,
         updated_at: updatedReview.updatedAt,
+        likes: updatedReview.likes,
       }
     };
   };
@@ -171,5 +175,25 @@ export class ReviewService {
     await this.reviewRepository.deleteReview(reviewId);
 
     return { status: 200, data: { message: '리뷰가 삭제되었습니다.' } };
+  };
+
+  likeReview = async (userId, reviewId) => {
+    const review = await this.reviewRepository.getReviewById(reviewId);
+
+    if (!review) {
+      throw new HttpError.NotFound('좋아요를 누를 리뷰가 존재하지 않습니다.');
+    }
+
+    const existingLike = await this.reviewRepository.findReviewLike(userId, reviewId);
+
+    if (existingLike) {
+      await this.reviewRepository.deleteReviewLike(existingLike.id);
+      await this.reviewRepository.decrementLikes(reviewId);
+      return { status: 200, data: { message: '좋아요를 취소했습니다.' } };
+    } else {
+      await this.reviewRepository.createReviewLike(userId, reviewId);
+      await this.reviewRepository.incrementLikes(reviewId);
+      return { status: 200, data: { message: '좋아요를 눌렀습니다.' } };
+    }
   };
 }
