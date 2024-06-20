@@ -13,18 +13,18 @@ const reviewService = new ReviewService(reviewRepository);
 const reviewController = new ReviewController(reviewService);
 
 // 리뷰 생성 api
-reviewsRouter.post('/sitters/:sitterId/reviews', requireAccessToken, reviewController.createReview);
+reviewsRouter.post('/reviews', requireAccessToken, (req, res, next) => reviewController.createReview(req, res, next));
 
 // 내가 작성한 리뷰 조회 api
-reviewsRouter.get('/reviews/my', requireAccessToken, reviewController.getUserReviews);
+reviewsRouter.get('/reviews/my', requireAccessToken, (req, res, next) => reviewController.getUserReviews(req, res, next));
 
 // 해당 펫시터의 리뷰 전체 조회 api
-reviewsRouter.get('/sitters/:sitterId/reviews', reviewController.getSitterReviews);
+reviewsRouter.get('/sitters/:sitterId/reviews', (req, res, next) => reviewController.getSitterReviews(req, res, next));
 
 // 리뷰 수정 api
-reviewsRouter.patch('/sitters/:sitterId/reviews/:reviewId', requireAccessToken, reviewController.updateReview);
+reviewsRouter.patch('/reviews/:reviewId', requireAccessToken, (req, res, next) => reviewController.updateReview(req, res, next));
 
 // 리뷰 삭제 api
-reviewsRouter.delete('/sitters/:sitterId/reviews/:reviewId', requireAccessToken, reviewController.deleteReview);
+reviewsRouter.delete('/reviews/:reviewId', requireAccessToken, (req, res, next) => reviewController.deleteReview(req, res, next));
 
 export { reviewsRouter };
