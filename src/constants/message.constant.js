@@ -15,14 +15,13 @@ export const MESSAGES = {
       },
       SERVICE: {
         REQUIRED: '서비스를 입력해 주세요.',
+        INVALID_SERVICE_TYPE:
+          'PET_WALKING 이나 PET_CARE, PET_GROOMING 에서 서비스를 골라주세요',
       },
       NOT_FOUND: '예약이 존재하지 않습니다.',
     },
     CREATE: {
-      IS_EXIST: '해당 날짜에 펫시터의 예약이 이미있습니다.',
-      IS_NOT_EXIST: '없는 시터 정보입니다.',
-      INVALID_SERVICE_TYPE:
-        'PET_WALKING 이나 PET_CARE, PET_GROOMING 에서 서비스를 골라주세요',
+      DUPLICATE: '해당 펫시터는 이미 해당 날짜에 예약되어 있습니다.',
       SUCCEED: '예약 생성에 성공했습니다.',
     },
     READ: {
