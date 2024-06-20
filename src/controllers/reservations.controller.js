@@ -146,7 +146,10 @@ export class ReservationsController {
         });
       } else {
         // 내가 내 날짜에 수정가능하게
-        if (userId === alreadyReservation.userId) {
+        if (
+          userId === alreadyReservation.userId &&
+          id === alreadyReservation.id
+        ) {
           //수정가능하게
           const updatedReservation =
             await this.reservationsService.updateReservation(
@@ -162,7 +165,7 @@ export class ReservationsController {
             updatedReservation,
           });
         } else {
-          throw new HttpError.Conflict('이미 있는 예약입니다.');
+          throw new HttpError.Conflict('이미 예약된 정보입니다.');
         }
       }
 
