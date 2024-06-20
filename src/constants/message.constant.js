@@ -97,4 +97,11 @@ export const MESSAGES = {
     FAIL: '실패하였습니다.',
     //리뷰작성 성공, 수정성공, 삭제성공,
   },
+  USER: {
+    SUCCEED: '유저 정보 조회에 성공했습니다.',
+    EMPTY: '수정할 정보를 입력해주세요',
+    DUPLICATE: '동일한 이름입니다. 다시 입력해주세요.',
+    REQUIRED: '이미 존재하는 이름입니다.',
+    PATCH_SUCCEED: '정보가 수정되었습니다.',
+  },
 };

@@ -1,6 +1,8 @@
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,macos,windows,node,dotenv
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,macos,windows,node,dotenv
 
+예약수정시나리오.md
+
 ### dotenv ###
 .env
 

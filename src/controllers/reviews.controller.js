@@ -62,4 +62,16 @@ export class ReviewController {
       next(error);
     }
   };
+
+  likeReview = async (req, res, next) => {
+    const { reviewId } = req.params;
+    const userId = req.user.id;
+
+    try {
+      const result = await this.reviewService.likeReview(userId, parseInt(reviewId, 10));
+      return res.status(result.status).json(result.data || { error: result.message });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

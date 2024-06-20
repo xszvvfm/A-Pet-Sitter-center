@@ -4,30 +4,6 @@ export class ReservationsRepository {
   constructor(prisma) {
     this.prisma = prisma;
   }
-
-  // reservationReadOne = async (userId, id) => {
-  //   let data = await this.prisma.reservation.findFirst({
-  //     where: { id: +id, userId: +userId },
-  //   });
-  //   data = {
-  //     user_id: data.userId,
-  //     sitter_id: data.sitterId,
-  //     reserve_id: data.reserveId,
-  //     date: data.date,
-  //     service_type: data.service_type,
-  //     created_at: data.createdAt,
-  //     updated_at: data.updatedAt,
-  //   };
-  //   return data;
-  // };
-
-  // user_id,
-  // sitter_id,
-  // reserve_id,
-  // date,
-  // service_type,
-  // created_at,
-  // updated_at,
   /** 예약 생성 API **/
   create = async (sitterId, userId, date, service) => {
     const data = await this.prisma.reservation.create({
@@ -82,6 +58,7 @@ export class ReservationsRepository {
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
     };
+
     return data;
   };
 
@@ -127,6 +104,7 @@ export class ReservationsRepository {
         ...(sitterId && { sitterId }),
         ...(date && { date }),
         ...(service && { service }),
+        // ...service
       },
     });
     return updatedReservation;
