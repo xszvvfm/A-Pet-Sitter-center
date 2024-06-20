@@ -5,21 +5,21 @@ export class ReservationsRepository {
     this.prisma = prisma;
   }
 
-  reservationReadOne = async (userId, id) => {
-    let data = await this.prisma.reservation.findFirst({
-      where: { id: +id, userId: +userId },
-    });
-    data = {
-      user_id: data.userId,
-      sitter_id: data.sitterId,
-      reserve_id: data.reserveId,
-      date: data.date,
-      service_type: data.service_type,
-      created_at: data.createdAt,
-      updated_at: data.updatedAt,
-    };
-    return data;
-  };
+  // reservationReadOne = async (userId, id) => {
+  //   let data = await this.prisma.reservation.findFirst({
+  //     where: { id: +id, userId: +userId },
+  //   });
+  //   data = {
+  //     user_id: data.userId,
+  //     sitter_id: data.sitterId,
+  //     reserve_id: data.reserveId,
+  //     date: data.date,
+  //     service_type: data.service_type,
+  //     created_at: data.createdAt,
+  //     updated_at: data.updatedAt,
+  //   };
+  //   return data;
+  // };
 
   // user_id,
   // sitter_id,
@@ -69,18 +69,18 @@ export class ReservationsRepository {
   };
 
   //상세조회
-  reservationReadOne = async (id) => {
+  reservationReadOne = async (userId, id) => {
     let data = await this.prisma.reservation.findFirst({
-      where: { id: +id },
+      where: { id: +id, userId: +userId },
     });
     data = {
-      user_id: data.userId,
-      sitter_id: data.sitterId,
-      reserve_id: data.reserveId,
+      userId: data.userId,
+      sitterId: data.sitterId,
+      reserveId: data.reserveId,
       date: data.date,
-      service_type: data.service_type,
-      created_at: data.createdAt,
-      updated_at: data.updatedAt,
+      serviceType: data.service,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
     };
     return data;
   };
@@ -95,12 +95,25 @@ export class ReservationsRepository {
     return existReservation;
   };
 
+  /** 펫시터 조회 API **/
   findBySitterId = async (sitterId) => {
     console.log(sitterId);
     const existSitter = await this.prisma.petSitter.findUnique({
       where: { id: +sitterId },
     });
     return existSitter;
+  };
+
+  /** 동일한 펫시터와 날짜로 이미 예약이 있는지 확인 **/
+  findReservationBySitterIdAndDate = async (sitterId, date) => {
+    return await this.prisma.reservation.findUnique({
+      where: {
+        sitterId_date: {
+          sitterId: +sitterId,
+          date: new Date(date),
+        },
+      },
+    });
   };
 
   // };

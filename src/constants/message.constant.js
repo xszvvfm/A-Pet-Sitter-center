@@ -19,6 +19,7 @@ export const MESSAGES = {
       NOT_FOUND: '예약이 존재하지 않습니다.',
     },
     CREATE: {
+      DUPLICATE: '해당 펫시터는 이미 해당 날짜에 예약되어 있습니다.',
       IS_EXIST: '해당 날짜에 펫시터의 예약이 이미있습니다.',
       IS_NOT_EXIST: '없는 시터 정보입니다.',
       INVALID_SERVICE_TYPE:
