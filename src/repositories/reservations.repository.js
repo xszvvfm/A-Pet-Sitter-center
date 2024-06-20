@@ -55,7 +55,7 @@ export class ReservationsRepository {
 
     data = data.map((reservation) => {
       return {
-        reserveId: reservation.id,
+        id: reservation.id,
         userId: reservation.userId,
         sitterId: reservation.sitterId,
         date: reservation.date,
