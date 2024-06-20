@@ -22,13 +22,18 @@ export class ReservationsService {
 
     // 동일한 펫시터와 날짜로 이미 예약이 있는지 확인
     const existingReservation =
-      await this.reservationsRepository.findReservationBySitterIdAndDate(
-        sitterId,
-        date,
-      );
+      await this.reservationsRepository.findBySitterIdAndDate(sitterId, date);
 
     if (existingReservation) {
       throw new HttpError.BadRequest(MESSAGES.RESERVATIONS.CREATE.DUPLICATE);
+    }
+
+    // 현재 날짜와 예약 날짜 비교
+    const currentDate = new Date();
+    const reservationDate = new Date(date);
+
+    if (currentDate > reservationDate) {
+      throw new HttpError.BadRequest(MESSAGES.RESERVATIONS.CREATE.INVALID_DATE);
     }
 
     const data = await this.reservationsRepository.create(
