@@ -27,4 +27,7 @@ reviewsRouter.patch('/reviews/:reviewId', requireAccessToken, (req, res, next) =
 // 리뷰 삭제 api
 reviewsRouter.delete('/reviews/:reviewId', requireAccessToken, (req, res, next) => reviewController.deleteReview(req, res, next));
 
+// 리뷰 좋아요 api
+reviewsRouter.post('/reviews/:reviewId/likes', requireAccessToken, (req, res, next) => reviewController.likeReview(req, res, next));
+
 export { reviewsRouter };

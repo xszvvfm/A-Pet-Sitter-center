@@ -78,4 +78,48 @@ export class ReviewRepository {
       where: { id: parseInt(reviewId, 10) },
     });
   };
+
+  createReviewLike = async (userId, reviewId) => {
+    return await this.prisma.reviewLike.create({
+      data: {
+        userId,
+        reviewId,
+      },
+    });
+  };
+
+  findReviewLike = async (userId, reviewId) => {
+    return await this.prisma.reviewLike.findUnique({
+      where: {
+        userId_reviewId: {
+          userId,
+          reviewId,
+        },
+      },
+    });
+  };
+
+  deleteReviewLike = async (likeId) => {
+    return await this.prisma.reviewLike.delete({
+      where: { id: likeId },
+    });
+  };
+
+  incrementLikes = async (reviewId) => {
+    return await this.prisma.review.update({
+      where: { id: parseInt(reviewId, 10) },
+      data: {
+        likes: { increment: 1 },
+      },
+    });
+  };
+
+  decrementLikes = async (reviewId) => {
+    return await this.prisma.review.update({
+      where: { id: parseInt(reviewId, 10) },
+      data: {
+        likes: { decrement: 1 },
+      },
+    });
+  };
 }
