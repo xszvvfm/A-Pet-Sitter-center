@@ -45,9 +45,9 @@ export class ReservationsRepository {
   };
 
   //상세조회
-  reservationReadOne = async (userId, id) => {
+  reservationReadOne = async (id) => {
     let data = await this.prisma.reservation.findFirst({
-      where: { id: +id, userId: +userId },
+      where: { id: +id },
     });
     data = {
       userId: data.userId,
@@ -104,6 +104,7 @@ export class ReservationsRepository {
         ...(sitterId && { sitterId }),
         ...(date && { date }),
         ...(service && { service }),
+        // ...service
       },
     });
     return updatedReservation;
