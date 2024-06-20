@@ -90,6 +90,7 @@ export class ReservationsRepository {
         ...(sitterId && { sitterId }),
         ...(date && { date }),
         ...(service && { service }),
+        // ...service
       },
     });
     return updatedReservation;
