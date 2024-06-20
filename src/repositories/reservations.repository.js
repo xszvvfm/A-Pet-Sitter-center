@@ -31,7 +31,7 @@ export class ReservationsRepository {
 
     data = data.map((reservation) => {
       return {
-        reserveId: reservation.id,
+        id: reservation.id,
         userId: reservation.userId,
         sitterId: reservation.sitterId,
         date: reservation.date,
@@ -47,7 +47,7 @@ export class ReservationsRepository {
   //상세조회
   reservationReadOne = async (userId, id) => {
     let data = await this.prisma.reservation.findFirst({
-      where: { userId: +userId, id: +id },
+      where: { id: +id, userId: +userId },
     });
     data = {
       userId: data.userId,
@@ -72,12 +72,25 @@ export class ReservationsRepository {
     return existReservation;
   };
 
+  /** 펫시터 조회 API **/
   findBySitterId = async (sitterId) => {
     console.log(sitterId);
     const existSitter = await this.prisma.petSitter.findUnique({
       where: { id: +sitterId },
     });
     return existSitter;
+  };
+
+  /** 동일한 펫시터와 날짜로 이미 예약이 있는지 확인 **/
+  findReservationBySitterIdAndDate = async (sitterId, date) => {
+    return await this.prisma.reservation.findUnique({
+      where: {
+        sitterId_date: {
+          sitterId: +sitterId,
+          date: new Date(date),
+        },
+      },
+    });
   };
 
   // };
