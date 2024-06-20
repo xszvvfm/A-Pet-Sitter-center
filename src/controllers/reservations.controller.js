@@ -14,34 +14,14 @@ export class ReservationsController {
       const user = req.user;
       const userId = user.id;
       const { sitterId, date, service } = req.body;
+      console.log(sitterId);
 
-      // 필수 입력 필드 검증 : 바디에 들어왔는지 아닌지 => 디비에서 찾지 않아도 되므로 컨트롤러
-      if (!sitterId || !date || !service) {
-        return res.status(HTTP_STATUS.BAD_REQUEST).json({
-          status: HTTP_STATUS.BAD_REQUEST,
-          message: 'OOO를 입력해 주세요.',
-        });
-      }
-
-      // PetSitter가 존재하는지 확인 : 레파지토리
-      const petSitter = await this.prisma.petSitter.findUnique({
-        where: { id: +sitterId },
-      });
-
-      //서비스
-      if (!petSitter) {
-        return res.status(HTTP_STATUS.BAD_REQUEST).json({
-          status: HTTP_STATUS.BAD_REQUEST,
-          message: '유효하지 않은 sitterId입니다.',
-        });
-      }
-
-      const data = await this.reservationsService.create({
+      const data = await this.reservationsService.create(
         sitterId,
         userId,
         date,
         service,
-      });
+      );
 
       return res.status(HTTP_STATUS.CREATED).json({
         status: HTTP_STATUS.CREATED,
@@ -75,11 +55,11 @@ export class ReservationsController {
         sort = 'desc';
       }
 
-      const data = await this.reservationsService.readMany({ userId, sort });
+      const data = await this.reservationsService.readMany(userId, sort);
 
       return res.status(HTTP_STATUS.OK).json({
         status: HTTP_STATUS.OK,
-        message: MESSAGES.RESERVATIONS.READ_LIST.SUCCEED,
+        message: MESSAGES.RESERVATIONS.READ.SUCCEED,
         data,
       });
     } catch (error) {
@@ -107,6 +87,22 @@ export class ReservationsController {
 
   //예약수정///
   //상세조회
+  getReservationById = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+
+      const oneReservation =
+        await this.reservationsService.findReservationById(id);
+
+      return res.status(HTTP_STATUS.OK).json({
+        status: HTTP_STATUS.OK,
+        message: MESSAGES.RESERVATIONS.READ.SUCCEED,
+        oneReservation,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 
   //
   updateReservation = async (req, res, next) => {
@@ -147,12 +143,14 @@ export class ReservationsController {
     try {
       const user = req.user;
       const userId = user.id;
-      const { reserveId } = req.params;
+      const { id } = req.params;
+
+      const data = await this.reservationsService.delete(userId, id);
 
       return res.status(HTTP_STATUS.OK).json({
         status: HTTP_STATUS.OK,
         message: MESSAGES.RESERVATIONS.DELETE.SUCCEED,
-        data: { id: null },
+        data,
       });
     } catch (error) {
       next(error);

@@ -1,4 +1,15 @@
 import { HttpError } from '../errors/http.error.js';
+import AWS from 'aws-sdk';
+import { config } from 'dotenv';
+config();
+
+const s3 = new AWS.S3({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
 
 export class PetSitterService {
   constructor(petSitterRepository) {
@@ -43,6 +54,7 @@ export class PetSitterService {
       name: sitter.name,
       experience: sitter.experience,
       region: sitter.region,
+      profileImage: sitter.profileImage,
     }));
   };
 
@@ -54,7 +66,7 @@ export class PetSitterService {
     }
 
     const reservations = await this.petSitterRepository.findReservationsBySitterId(parseInt(sitterId, 10));
-    const reviews = await this.petSitterRepository.findReviewsBySitterId(parseInt(sitterId, 10)); // 리뷰 조회 추가
+    const reviews = await this.petSitterRepository.findReviewsBySitterId(parseInt(sitterId, 10));
 
     const reservedDates = reservations.map(reservation => reservation.date.toISOString().split('T')[0]);
 
@@ -71,7 +83,6 @@ export class PetSitterService {
       }
     }
 
-    // 평균 평점 계산
     const totalRatings = reviews.reduce((sum, review) => sum + review.rating, 0);
     const averageRating = reviews.length > 0 ? (totalRatings / reviews.length).toFixed(2) : 'No ratings';
 
@@ -80,8 +91,26 @@ export class PetSitterService {
       name: petSitter.name,
       experience: petSitter.experience,
       region: petSitter.region,
-      averageRating, // 평균 평점 추가
+      profileImage: petSitter.profileImage, // 프로필 이미지 추가
+      averageRating,
       availableDates,
     };
+  };
+
+  updateProfileImage = async (sitterId, imagePath) => {
+    const currentImagePath = await this.petSitterRepository.getProfileImagePath(sitterId);
+
+    if (currentImagePath) {
+      const bucketName = process.env.AWS_S3_BUCKET_NAME;
+      const key = currentImagePath.split('/').pop();
+
+      // 기존 이미지 삭제
+      await s3.deleteObject({
+        Bucket: bucketName,
+        Key: key,
+      }).promise();
+    }
+
+    return await this.petSitterRepository.updateProfileImage(sitterId, imagePath);
   };
 }
