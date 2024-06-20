@@ -54,7 +54,7 @@ export class UserController {
         email: updateUserInfo.email,
         username: updateUserInfo.username,
         createdAt: updateUserInfo.createdAt,
-        updateData: updateUserInfo.updatedAt,
+        updatedAt: updateUserInfo.updatedAt,
       };
       return res
         .status(HTTP_STATUS.OK)
