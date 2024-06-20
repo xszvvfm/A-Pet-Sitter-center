@@ -17,6 +17,16 @@ userRouter.get('/user', requireAccessToken, async (req, res, next) => {
         username: true,
         createdAt: true,
         updatedAt: true,
+        reservations: {
+          select: {
+            id: true,
+            sitterId: true,
+            date: true,
+            service: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
       },
     });
 
