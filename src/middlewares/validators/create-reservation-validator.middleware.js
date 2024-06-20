@@ -11,9 +11,13 @@ const schema = Joi.object({
     'any.required': MESSAGES.RESERVATIONS.COMMON.DATE.REQUIRED,
     'date.base': MESSAGES.RESERVATIONS.COMMON.DATE.DATE_BASE,
   }),
-  service: Joi.string().required().messages({
-    'any.required': MESSAGES.RESERVATIONS.COMMON.SERVICE.REQUIRED,
-  }),
+  service: Joi.string()
+    .valid('PET_WALKING', 'PET_CARE', 'PET_GROOMING')
+    .required()
+    .messages({
+      'any.required': MESSAGES.RESERVATIONS.COMMON.SERVICE.REQUIRED,
+      'any.only': MESSAGES.RESERVATIONS.COMMON.SERVICE.INVALID_SERVICE_TYPE,
+    }),
 });
 
 export const createReservationValidator = async (req, res, next) => {
