@@ -122,54 +122,38 @@ export class ReservationsController {
 
       //해당 펫시터에게 예약이 있는 날짜인지 확인하기
       // 펫시터정보를 어디서 가져올지? 펫시터의 예약의-> 날짜
-      //-------
-      // console.log(date);
-      const alreadyReservation = await prisma.reservation.findFirst({
-        where: { sitterId: +sitterId, date },
+
+      /////------------------추가부분----------------------////////
+      //레파지토리
+      // const alreadyReservation = await prisma.reservation.findFirst({
+      //   where: { sitterId: +sitterId, date },
+      // });
+      // console.log('alreadyReservation-->', alreadyReservation);
+
+      // //서비스
+      // //alreadyReservation 이 null 이면 해당 날짜에 예약이 없는 것=> 예약가능하게
+      // const isMyReservation =
+      //   userId === alreadyReservation.userId && id === alreadyReservation.id;
+      // //안되는 경우 먼저 거르기
+      // if (alreadyReservation && !isMyReservation) {
+      //   throw new HttpError.Conflict('이미 예약된 정보입니다.');
+      // }
+      const updatedReservation =
+        await this.reservationsService.updateReservation(
+          parseInt(id),
+          parseInt(sitterId),
+          new Date(date),
+          service,
+          userId,
+        );
+
+      //컨트롤러//
+      return res.status(HTTP_STATUS.OK).json({
+        status: HTTP_STATUS.OK,
+        message: MESSAGES.RESERVATIONS.UPDATE.SUCCEED,
+        updatedReservation,
       });
-      console.log('alreadyReservation-->', alreadyReservation);
-      //alreadyReservation 이 null 이면 해당 날짜에 예약이 없는 것=> 예약가능하게
-      if (alreadyReservation === null) {
-        //업데이트 실행
-        const updatedReservation =
-          await this.reservationsService.updateReservation(
-            parseInt(id),
-            parseInt(sitterId),
-            new Date(date),
-            service,
-          );
-
-        return res.status(HTTP_STATUS.OK).json({
-          status: HTTP_STATUS.OK,
-          message: MESSAGES.RESERVATIONS.UPDATE.SUCCEED,
-          updatedReservation,
-        });
-      } else {
-        // 내가 내 날짜에 수정가능하게
-        if (
-          userId === alreadyReservation.userId &&
-          id === alreadyReservation.id
-        ) {
-          //수정가능하게
-          const updatedReservation =
-            await this.reservationsService.updateReservation(
-              parseInt(id),
-              parseInt(sitterId),
-              new Date(date),
-              service,
-            );
-
-          return res.status(HTTP_STATUS.OK).json({
-            status: HTTP_STATUS.OK,
-            message: MESSAGES.RESERVATIONS.UPDATE.SUCCEED,
-            updatedReservation,
-          });
-        } else {
-          throw new HttpError.Conflict('이미 예약된 정보입니다.');
-        }
-      }
-
-      //--------
+      //--------추가구현부분-----------//
 
       //-----//가져올 아이디 등 어떻게 가져올지 다시 보기 :
     } catch (error) {
