@@ -10,7 +10,7 @@ export class UsersRepository {
       password,
       authConstant.HASH_SALT_ROUNDS,
     );
-    const { _password, ...user } = await this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: {
         email,
         password: hassedPassword,
@@ -62,5 +62,44 @@ export class UsersRepository {
       },
     });
     return token;
+  };
+
+  findUser = async (id) => {
+    const data = await this.prisma.user.findUnique({
+      where: { id: +id },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        createdAt: true,
+        updatedAt: true,
+        reservations: {
+          select: {
+            id: true,
+            sitterId: true,
+            date: true,
+            service: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+      },
+    });
+    return data;
+  };
+
+  findName = async (username) => {
+    const data = await this.prisma.user.findFirst({
+      where: { username },
+    });
+    return data;
+  };
+
+  updateInfo = async (id, updateData) => {
+    const info = await this.prisma.user.update({
+      where: { id },
+      data: updateData,
+    });
+    return info;
   };
 }

@@ -20,6 +20,17 @@ export class ReservationsService {
       );
     }
 
+    // 동일한 펫시터와 날짜로 이미 예약이 있는지 확인
+    const existingReservation =
+      await this.reservationsRepository.findReservationBySitterIdAndDate(
+        sitterId,
+        date,
+      );
+
+    if (existingReservation) {
+      throw new HttpError.BadRequest(MESSAGES.RESERVATIONS.CREATE.DUPLICATE);
+    }
+
     const data = await this.reservationsRepository.create(
       sitterId,
       userId,

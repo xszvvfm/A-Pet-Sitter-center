@@ -4,30 +4,6 @@ export class ReservationsRepository {
   constructor(prisma) {
     this.prisma = prisma;
   }
-
-  // reservationReadOne = async (userId, id) => {
-  //   let data = await this.prisma.reservation.findFirst({
-  //     where: { id: +id, userId: +userId },
-  //   });
-  //   data = {
-  //     user_id: data.userId,
-  //     sitter_id: data.sitterId,
-  //     reserve_id: data.reserveId,
-  //     date: data.date,
-  //     service_type: data.service_type,
-  //     created_at: data.createdAt,
-  //     updated_at: data.updatedAt,
-  //   };
-  //   return data;
-  // };
-
-  // user_id,
-  // sitter_id,
-  // reserve_id,
-  // date,
-  // service_type,
-  // created_at,
-  // updated_at,
   /** 예약 생성 API **/
   create = async (sitterId, userId, date, service) => {
     const data = await this.prisma.reservation.create({
@@ -55,7 +31,7 @@ export class ReservationsRepository {
 
     data = data.map((reservation) => {
       return {
-        reserveId: reservation.id,
+        id: reservation.id,
         userId: reservation.userId,
         sitterId: reservation.sitterId,
         date: reservation.date,
@@ -78,10 +54,11 @@ export class ReservationsRepository {
       sitterId: data.sitterId,
       reserveId: data.reserveId,
       date: data.date,
-      serviceType: data.service_type,
+      serviceType: data.service,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
     };
+
     return data;
   };
 
@@ -95,12 +72,25 @@ export class ReservationsRepository {
     return existReservation;
   };
 
+  /** 펫시터 조회 API **/
   findBySitterId = async (sitterId) => {
     console.log(sitterId);
     const existSitter = await this.prisma.petSitter.findUnique({
       where: { id: +sitterId },
     });
     return existSitter;
+  };
+
+  /** 동일한 펫시터와 날짜로 이미 예약이 있는지 확인 **/
+  findReservationBySitterIdAndDate = async (sitterId, date) => {
+    return await this.prisma.reservation.findUnique({
+      where: {
+        sitterId_date: {
+          sitterId: +sitterId,
+          date: new Date(date),
+        },
+      },
+    });
   };
 
   // };

@@ -28,7 +28,7 @@ export class ReservationsController {
         status: HTTP_STATUS.CREATED,
         message: MESSAGES.RESERVATIONS.CREATE.SUCCEED,
         data: {
-          reserveId: data.id,
+          id: data.id,
           userId: data.userId,
           sitterId: data.sitterId,
           date: data.date,

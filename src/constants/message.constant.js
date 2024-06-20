@@ -15,14 +15,13 @@ export const MESSAGES = {
       },
       SERVICE: {
         REQUIRED: '서비스를 입력해 주세요.',
+        INVALID_SERVICE_TYPE:
+          'PET_WALKING 이나 PET_CARE, PET_GROOMING 에서 서비스를 골라주세요',
       },
       NOT_FOUND: '예약이 존재하지 않습니다.',
     },
     CREATE: {
-      IS_EXIST: '해당 날짜에 펫시터의 예약이 이미있습니다.',
-      IS_NOT_EXIST: '없는 시터 정보입니다.',
-      INVALID_SERVICE_TYPE:
-        'PET_WALKING 이나 PET_CARE, PET_GROOMING 에서 서비스를 골라주세요',
+      DUPLICATE: '해당 펫시터는 이미 해당 날짜에 예약되어 있습니다.',
       SUCCEED: '예약 생성에 성공했습니다.',
     },
     READ: {
@@ -95,5 +94,12 @@ export const MESSAGES = {
     DELTE_SUCCEED: '리뷰 삭제에 성공하였습니다.',
     FAIL: '실패하였습니다.',
     //리뷰작성 성공, 수정성공, 삭제성공,
+  },
+  USER: {
+    SUCCEED: '유저 정보 조회에 성공했습니다.',
+    EMPTY: '수정할 정보를 입력해주세요',
+    DUPLICATE: '동일한 이름입니다. 다시 입력해주세요.',
+    REQUIRED: '이미 존재하는 이름입니다.',
+    PATCH_SUCCEED: '정보가 수정되었습니다.',
   },
 };
