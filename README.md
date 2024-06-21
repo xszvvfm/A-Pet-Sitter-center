@@ -2,10 +2,10 @@
 
 ## 🐶 A+ 펫 시터 센터
 
-- [배포 웹 사이트 링크](추가 예정)
+- [배포 웹 사이트 링크](http://xszvvfm.shop:3500/api)
 - [API 명세서 링크](https://www.notion.so/teamsparta/013ef3c01a964ae4b46aec521b116175?v=e380d7488baf4abcb07d5f45a362fe5d)
 - [ERD 링크](https://drawsql.app/teams/kimmin889/diagrams/pet)
-- [시연 영상 링크](추가 예정)
+- [시연 영상 링크](https://youtu.be/PSA93Qxewow)
 
 ### 📝 프로젝트 소개
 
